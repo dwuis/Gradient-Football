@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Voetbal - 3D</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400;500&display=swap');
+
+  html, body { margin:0; padding:0; overflow:hidden; background:#000000; height:100%; }
+  canvas { display:block; touch-action:none; }
+  #bgCanvas { position:fixed; inset:0; z-index:0; background:#000000; }
+  #hint {
+    position:fixed; bottom:16px; left:50%; transform:translateX(-50%); z-index:2;
+    font-family: 'DM Sans', sans-serif;
+    font-size:12px; color:#666; letter-spacing:0.02em; user-select:none; pointer-events:none;
+  }
+  #panelsContainer {
+    position:fixed; top:16px; left:16px; z-index:2;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  .panel {
+    font-family: 'DM Sans', sans-serif;
+    background: rgba(0, 0, 0, 0.95);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 0;
+    color: #fff;
+    width: 230px;
+    box-sizing: border-box;
+  }
+  .panel-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:14px 16px; cursor:pointer; user-select:none;
+  }
+  .panel-header span {
+    font-size:13px; font-weight:400; letter-spacing:0.03em; color:#fff;
+    text-transform:uppercase; font-family:'DM Mono', monospace;
+  }
+  .collapseBtn {
+    width:20px; height:20px; border:1px solid rgba(255,255,255,0.3);
+    background:transparent; color:#fff; font-family:'DM Mono', monospace;
+    font-size:13px; line-height:1; cursor:pointer; padding:0;
+  }
+  .panel-body { padding: 0 18px 16px 18px; }
+  .panel.collapsed .panel-body { display:none; }
+  .row { margin-bottom:14px; }
+  .row:last-child { margin-bottom:0; }
+  .row label { display:flex; justify-content:space-between; font-size:11.5px; color:rgba(255,255,255,0.7); margin-bottom:6px; font-family:'DM Mono', monospace; text-transform:uppercase; letter-spacing:0.03em; }
+  .row label span.val { color:#fff; font-weight:400; font-family:'DM Sans', sans-serif; text-transform:none; letter-spacing:0; }
+  input[type=range] {
+    width:100%; -webkit-appearance:none; appearance:none;
+    height:3px; background:rgba(255,255,255,0.25); border-radius:0; outline:none;
+    box-sizing: border-box;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance:none; appearance:none;
+    width:14px; height:14px; border-radius:50%;
+    background:#fff; cursor:pointer; border:none;
+  }
+  input[type=range]::-moz-range-thumb {
+    width:14px; height:14px; border-radius:50%;
+    background:#fff; cursor:pointer; border:none;
+  }
+  #viewSwitch {
+    display:flex; background:rgba(255,255,255,0.06); border-radius:0; padding:3px; gap:3px;
+    width:100%; box-sizing:border-box;
+  }
+  #viewSwitch button {
+    flex:1; border:none; background:transparent; color:rgba(255,255,255,0.7); font-size:10.5px;
+    padding:9px 6px; border-radius:0; cursor:pointer; font-family:'DM Mono', monospace;
+    text-transform:uppercase; letter-spacing:0.03em; transition:background 0.15s, color 0.15s;
+  }
+  #viewSwitch button.active { background:#ff1901; color:#000; font-weight:400; }
+  #gradTypeSwitch {
+    display:flex; background:rgba(255,255,255,0.06); border-radius:0; padding:3px; gap:3px;
+    width:100%; box-sizing:border-box;
+  }
+  #gradTypeSwitch button {
+    flex:1; border:none; background:transparent; color:rgba(255,255,255,0.7); font-size:9.5px;
+    padding:9px 4px; border-radius:0; cursor:pointer; font-family:'DM Mono', monospace;
+    text-transform:uppercase; letter-spacing:0.02em; transition:background 0.15s, color 0.15s;
+  }
+  #gradTypeSwitch button.active { background:#ff1901; color:#000; font-weight:400; }
+  input.color-input {
+    -webkit-appearance:none; appearance:none; width:100%; height:32px;
+    border:1px solid rgba(255,255,255,0.25); background:none; padding:2px; cursor:pointer;
+  }
+  input.color-input::-webkit-color-swatch-wrapper { padding:0; }
+  input.color-input::-webkit-color-swatch { border:none; }
+  .swatch-group { display:flex; gap:8px; }
+  .swatch-item { display:flex; flex-direction:column; align-items:center; gap:5px; flex:1; }
+  .swatch-label {
+    font-family:'DM Mono', monospace; font-size:9.5px; text-transform:uppercase;
+    color:rgba(255,255,255,0.6); letter-spacing:0.03em;
+  }
+  .swatch {
+    width:100%; aspect-ratio:1; border:1px solid rgba(255,255,255,0.3);
+    cursor:pointer; padding:0; box-sizing:border-box;
+  }
+  .swatch:hover { border-color:#ff1901; }
+  .hex-input {
+    width:100%; box-sizing:border-box; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.25); color:#fff; font-family:'DM Mono', monospace;
+    font-size:12px; padding:8px 10px; text-transform:uppercase; letter-spacing:0.03em;
+  }
+  .hex-input:focus { outline:none; border-color:#ff1901; }
+  #colorPopup .panel-header { cursor:default; }
+  .toggle-track {
+    position:relative; width:100%; height:34px; background:rgba(255,255,255,0.06);
+    cursor:pointer; user-select:none; box-sizing:border-box;
+  }
+  .toggle-thumb {
+    position:absolute; top:3px; left:3px; width:calc(50% - 3px); height:28px;
+    background:#ff1901; transition:left 0.18s ease;
+  }
+  .toggle-track.right .toggle-thumb { left:50%; }
+  .toggle-labels { position:relative; z-index:1; display:flex; height:100%; }
+  .toggle-labels span {
+    flex:1; display:flex; align-items:center; justify-content:center;
+    font-family:'DM Mono', monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.02em; color:rgba(255,255,255,0.7); transition:color 0.18s ease;
+    text-align:center; padding:0 4px;
+  }
+  .toggle-track.left .toggle-labels span:first-child,
+  .toggle-track.right .toggle-labels span:last-child { color:#000; }
+  #loading {
+    position:fixed; top:16px; right:16px; z-index:2; font-family:'DM Mono', monospace; font-size:12px; color:#888;
+    opacity:0; transition:opacity 0.2s;
+  }
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div id="panelsContainer">
+
+  <div class="panel collapsed" id="panelBall">
+    <div class="panel-header" data-target="panelBall">
+      <span>Bal</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div id="viewSwitch">
+          <button id="btnImages" class="active">Afbeeldingen</button>
+          <button id="btnOutline">Lijntekening</button>
+        </div>
+      </div>
+      <div class="row">
+        <label>Grootte bal <span class="val" id="sizeVal">100%</span></label>
+        <input type="range" id="sizeSlider" min="0.5" max="2" step="0.01" value="1">
+      </div>
+      <div class="row">
+        <label>Aantal hexagons <span class="val" id="hexVal">150</span></label>
+        <input type="range" id="hexSlider" min="2" max="5" step="1" value="4">
+      </div>
+      <div class="row">
+        <label>Tussenruimte panelen <span class="val" id="gapVal">0.00</span></label>
+        <input type="range" id="gapSlider" min="0" max="0.3" step="0.01" value="0">
+      </div>
+      <div class="row" id="thickRow" style="display:none;">
+        <label>Lijndikte <span class="val" id="thickVal">0.003</span></label>
+        <input type="range" id="thickSlider" min="0.003" max="0.05" step="0.001" value="0.003">
+      </div>
+      <div class="row">
+        <label>Draaisnelheid <span class="val" id="speedVal">0.0028</span></label>
+        <input type="range" id="speedSlider" min="0" max="0.02" step="0.0005" value="0.0028">
+      </div>
+      <div class="row">
+        <label>Draairichting</label>
+        <div id="dirToggle" class="toggle-track left">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Met de klok mee</span>
+            <span>Tegen de klok in</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Rand-blur hexagons <span class="val" id="edgeBlurVal">0</span></label>
+        <input type="range" id="edgeBlurSlider" min="0" max="15" step="0.5" value="0">
+      </div>
+    </div>
+  </div>
+
+  <div class="panel collapsed" id="panelBg">
+    <div class="panel-header" data-target="panelBg">
+      <span>Achtergrond</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <label>Aantal rijen <span class="val" id="rowsVal">6</span></label>
+        <input type="range" id="rowsSlider" min="2" max="14" step="1" value="6">
+      </div>
+      <div class="row">
+        <label>Aantal geanimeerde banen <span class="val" id="lanesVal">2</span></label>
+        <input type="range" id="lanesSlider" min="1" max="5" step="1" value="2">
+      </div>
+      <div class="row">
+        <label>Stagger banen <span class="val" id="staggerVal">0.30</span></label>
+        <input type="range" id="staggerSlider" min="0" max="1" step="0.05" value="0.3">
+      </div>
+      <div class="row">
+        <label>Snelheid banen <span class="val" id="laneSpeedVal">1.00</span></label>
+        <input type="range" id="laneSpeedSlider" min="0.1" max="3" step="0.05" value="1">
+      </div>
+      <div class="row">
+        <label>Lengte banen <span class="val" id="laneLengthVal">2.4</span></label>
+        <input type="range" id="laneLengthSlider" min="0.5" max="10" step="0.1" value="2.4">
+      </div>
+      <div class="row">
+        <label>Stagger lengtes <span class="val" id="lengthStaggerVal">0.30</span></label>
+        <input type="range" id="lengthStaggerSlider" min="0" max="1" step="0.05" value="0.3">
+      </div>
+      <div class="row">
+        <label>Animatie</label>
+        <div id="bgVisToggle" class="toggle-track right">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Zichtbaar</span>
+            <span>Verborgen</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Kleur</label>
+        <div class="swatch-group">
+          <div class="swatch-item">
+            <span class="swatch-label">Vormen</span>
+            <button class="swatch" id="swatchBg" data-target="bg" style="background:#190076"></button>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-label">Achtergrond</span>
+            <button class="swatch" id="swatchBgPage" data-target="bgPage" style="background:#000000"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel collapsed" id="panelGradient">
+    <div class="panel-header" data-target="panelGradient">
+      <span>Gradient</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <label>Type</label>
+        <div id="gradTypeSwitch">
+          <button id="btnGradLinear" class="active">Lineair</button>
+          <button id="btnGradRadial">Radiaal</button>
+          <button id="btnGradAngular">Angulair</button>
+        </div>
+      </div>
+      <div class="row" id="gradAngleRow">
+        <label>Hoek <span class="val" id="gradAngleVal">0°</span></label>
+        <input type="range" id="gradAngleSlider" min="0" max="360" step="1" value="0">
+      </div>
+      <div class="row">
+        <label>Snelheid <span class="val" id="gradSpeedVal">1.00</span></label>
+        <input type="range" id="gradSpeedSlider" min="0" max="6" step="0.05" value="1">
+      </div>
+      <div class="row">
+        <label>Stagger hexagons <span class="val" id="gradStaggerVal">0.00</span></label>
+        <input type="range" id="gradStaggerSlider" min="0" max="1" step="0.05" value="0">
+      </div>
+      <div class="row">
+        <label>Richting</label>
+        <div id="gradDirToggle" class="toggle-track right">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Voorwaarts</span>
+            <span>Achterwaarts</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Blur <span class="val" id="gradBlurVal">11</span></label>
+        <input type="range" id="gradBlurSlider" min="0" max="20" step="0.5" value="11">
+      </div>
+      <div class="row">
+        <label>Noise <span class="val" id="gradNoiseVal">0.25</span></label>
+        <input type="range" id="gradNoiseSlider" min="0" max="1" step="0.05" value="0.25">
+      </div>
+      <div class="row">
+        <label>Kleuren</label>
+        <div class="swatch-group">
+          <div class="swatch-item">
+            <span class="swatch-label">A</span>
+            <button class="swatch" id="swatchGradA" data-target="gradA" style="background:#000000"></button>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-label">B</span>
+            <button class="swatch" id="swatchGradB" data-target="gradB" style="background:#190076"></button>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-label">C</span>
+            <button class="swatch" id="swatchGradC" data-target="gradC" style="background:#e9ffc4"></button>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-label">D</span>
+            <button class="swatch" id="swatchGradD" data-target="gradD" style="background:#ad0037"></button>
+          </div>
+          <div class="swatch-item">
+            <span class="swatch-label">E</span>
+            <button class="swatch" id="swatchGradE" data-target="gradE" style="background:#4000a3"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="colorPopup" class="panel" style="position:fixed; display:none; width:200px; z-index:5;">
+  <div class="panel-header" id="colorPopupHeader">
+    <span id="colorPopupTitle">Kleur</span>
+    <button class="collapseBtn" id="colorPopupClose">×</button>
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <canvas id="svCanvas" width="164" height="164" style="width:100%; height:164px; cursor:crosshair; display:block;"></canvas>
+    </div>
+    <div class="row">
+      <canvas id="hueCanvas" width="164" height="14" style="width:100%; height:14px; cursor:pointer; display:block;"></canvas>
+    </div>
+    <div class="row">
+      <label>Hex</label>
+      <input type="text" id="hexInput" class="hex-input" maxlength="7" spellcheck="false">
+    </div>
+  </div>
+</div>
+
+<div id="loading">bezig met opbouwen…</div>
+<div id="hint">Sleep om te draaien · scroll om te zoomen</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ---------------------------------------------------------
+   3D voetbal, opgebouwd als een geodetische onderverdeling
+   van een icosaëder waarvan we de duale ("Goldberg")
+   tessellatie gebruiken: 12 vijfhoeken (altijd op de posities
+   van de oorspronkelijke icosaëder-hoekpunten, wiskundig
+   nooit meer of minder, en nooit aan elkaar grenzend) +
+   een instelbaar aantal zeshoeken. Om ook bij meer hexagons
+   het voetbal-gevoel te behouden, krijgen ook sommige
+   zeshoeken de logo-afbeelding, verspreid zodat ze elkaar
+   nooit raken (net als de vijfhoeken) - dat aantal groeit
+   automatisch mee met het totaal aantal panelen.
+--------------------------------------------------------- */
+
+let scene, camera, renderer, group, ballMesh;
+const R = 2;
+
+let currentSeamData = null;
+let tubeMesh = null, jointMesh = null;
+let panelMeshes = [];
+
+const seamMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+let ballScale = 1.0;
+let subdivN = 4;
+let viewMode = 'images'; // 'images' | 'outline'
+let gapValue = 0.0;
+let tubeRadiusVal = 0.003;
+let rotationSpeed = 0.0028;
+let rotationDirection = 1;
+
+// ------ gradient-animatie binnen de bal ------
+let gradBuckets = [];
+let gradType = 'linear'; // 'linear' | 'radial' | 'angular'
+let gradSpeed = 1.0;
+let gradColors = ['#000000', '#190076', '#e9ffc4', '#ad0037', '#4000a3'];
+let gradAngleDeg = 0;      // richting van de lineaire gradient
+let gradStagger = 0.0;     // 0 = alle hexagons volledig gesynchroniseerd
+let gradDirection = -1;    // 1 = voorwaarts, -1 = achterwaarts
+let gradBlur = 11;         // zachte blur op de gradient binnen elk hexagon (px)
+let gradNoise = 0.25;      // korrel/noise over de gradient (0-1)
+let ballEdgeBlur = 0;      // zachte blur over de hele bal, laat hexagon-randen in elkaar overlopen
+let noiseCanvas, noiseCtx, lastNoiseUpdate = 0;
+let bgAnimVisible = false; // achtergrondanimatie tonen/verbergen
+const GRADIENT_STOPS = 20; // vaste posities; alleen de kleur erop schuift door de tijd
+const GRAD_BUCKETS = 8;    // aantal onafhankelijke gradient-varianten voor de stagger
+
+let bgColor = '#190076';
+let bgPageColor = '#000000';
+const BG_CELL = 84;
+const BG_GAP = 6;
+const BG_FILL_CHANCE = 0.55;
+let bgCanvas, bgCtx, bgCols, bgRows, bgCells = [];
+let bgShapePaths = [];
+
+// exacte centra van de 5 gebruikte vakken in het 3x3-grid (zie grid.svg)
+const CLUSTER_SLOTS = [
+  { x:1/6, y:1/6 }, // linksboven
+  { x:5/6, y:1/6 }, // rechtsboven
+  { x:0.5, y:0.5 },  // midden
+  { x:1/6, y:5/6 }, // linksonder
+  { x:5/6, y:5/6 }  // rechtsonder
+];
+const CELL_MARGIN = 0.025; // 2.5% marge aan iedere kant van elke vorm
+const SLOT_HIDE_MIN = 80, SLOT_HIDE_MAX = 500;   // korte "blip" waarin een vorm even weg is
+const SLOT_SHOW_MIN = 300, SLOT_SHOW_MAX = 1800;  // duur dat een vorm zichtbaar blijft
+const SHAPE_CHANGE_MIN = 350, SHAPE_CHANGE_MAX = 1100;
+// vaste samenstelling van de cluster (indices in bgShapePaths: 0=cirkel,1=kruis,2=bloem,3=geest,4=teken,5=blok)
+// deze 5 vormen wisselen alleen van PLEK met elkaar, niet van identiteit
+const CLUSTER_SHAPE_SET = [0,2,0,1,2]; // cirkel, bloem, cirkel, kruis, bloem
+
+const ROW_SWITCH_INTERVAL = 4200; // ms tussen het wisselen van actieve rijen
+const COMETS_PER_ROW = 1;        // één ononderbroken baan per actieve rij
+const COMET_CYCLE_BASE = 2400;   // basis ms om eenmaal het scherm te doorkruisen
+const COMET_WINDOW_BASE = 2.4;   // basis breedte van de zichtbare baan, in kolommen
+
+let laneSpeed = 1.0;             // via slider: snelheid-multiplier
+let laneLength = COMET_WINDOW_BASE; // via slider: lengte van de banen (in kolommen)
+let lengthStaggerAmount = 0.3;   // via slider: spreiding in lengte tussen rijen
+
+let gridRowCount = 6;            // via slider instelbaar
+let laneCount = 2;               // aantal gelijktijdig actieve banen, via slider
+let staggerAmount = 0.3;         // 0 = banen volledig gesynchroniseerd, 1 = maximaal uit fase
+let clusterPitch = 220, clusterSize = 176, slotSize = 55;
+let clusters = [];
+let activeRows = new Set([0,1]);
+let nextRowSwitch = 0;
+let rowPhaseSeed = [];
+let rowLengthSeed = [];
+
+init();
+animate();
+
+function init(){
+  scene = new THREE.Scene();
+  scene.background = null;
+
+  camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0,0,6.2);
+
+  renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  if (THREE.sRGBEncoding) renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.domElement.style.position = 'fixed';
+  renderer.domElement.style.inset = '0';
+  renderer.domElement.style.zIndex = '1';
+  renderer.domElement.style.filter = ballEdgeBlur > 0 ? `blur(${ballEdgeBlur}px)` : 'none';
+  document.body.appendChild(renderer.domElement);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.9));
+  const dl = new THREE.DirectionalLight(0xffffff, 0.3);
+  dl.position.set(4,6,5);
+  scene.add(dl);
+
+  group = new THREE.Group();
+  scene.add(group);
+
+  // subtiele bal-body, enkel zichtbaar in de lijntekening-weergave
+  const ballGeo = new THREE.SphereGeometry(R*0.97, 48, 48);
+  const ballMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff, roughness:0.9, metalness:0.0,
+    transparent:true, opacity:0.05, depthWrite:false
+  });
+  ballMesh = new THREE.Mesh(ballGeo, ballMat);
+  ballMesh.visible = false;
+  group.add(ballMesh);
+
+  group.rotation.set(0.35, -0.6, 0.1);
+
+  initGradient();
+  rebuildGeometry(subdivN);
+
+  initBackground();
+
+  addControls();
+  setupPanel();
+
+  window.addEventListener('resize', onResize);
+}
+
+function initGradient(){
+  gradBuckets = [];
+  for(let i=0;i<GRAD_BUCKETS;i++){
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    const texture = new THREE.CanvasTexture(canvas);
+    if (THREE.sRGBEncoding) texture.encoding = THREE.sRGBEncoding;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+    gradBuckets.push({ canvas, ctx, texture, material });
+  }
+
+  noiseCanvas = document.createElement('canvas');
+  noiseCanvas.width = 128;
+  noiseCanvas.height = 128;
+  noiseCtx = noiseCanvas.getContext('2d');
+  regenerateNoise();
+
+  drawAllGradients(0);
+}
+
+function regenerateNoise(){
+  const id = noiseCtx.createImageData(noiseCanvas.width, noiseCanvas.height);
+  const data = id.data;
+  for(let i=0;i<data.length;i+=4){
+    const v = Math.floor(Math.random()*255);
+    data[i]=v; data[i+1]=v; data[i+2]=v; data[i+3]=255;
+  }
+  noiseCtx.putImageData(id,0,0);
+}
+
+function hexToRgb(hex){
+  hex = hex.replace('#','');
+  return {
+    r: parseInt(hex.substring(0,2),16),
+    g: parseInt(hex.substring(2,4),16),
+    b: parseInt(hex.substring(4,6),16)
+  };
+}
+
+// bemonstert een doorlopende, cyclische kleurenpalet-functie: kleur[laatste] loopt
+// vloeiend terug naar kleur[0], zodat elke volledige cyclus perfect aansluit.
+function sampleCycleColor(colors, phase){
+  const n = colors.length;
+  let ph = phase % 1; if (ph < 0) ph += 1;
+  const scaled = ph * n;
+  const i0 = Math.floor(scaled) % n;
+  const i1 = (i0+1) % n;
+  const f = scaled - Math.floor(scaled);
+  const a = hexToRgb(colors[i0]), b = hexToRgb(colors[i1]);
+  const r = Math.round(a.r + (b.r-a.r)*f);
+  const g = Math.round(a.g + (b.g-a.g)*f);
+  const bl = Math.round(a.b + (b.b-a.b)*f);
+  return `rgb(${r},${g},${bl})`;
+}
+
+function drawAllGradients(now){
+  if (!gradBuckets.length) return;
+  if (gradNoise > 0 && now - lastNoiseUpdate > 90){
+    regenerateNoise();
+    lastNoiseUpdate = now;
+  }
+  for(let i=0;i<gradBuckets.length;i++){
+    const bucketPhase = (i/gradBuckets.length) * gradStagger;
+    drawGradientOnto(gradBuckets[i], now, bucketPhase);
+  }
+}
+
+function drawGradientOnto(bucket, now, phaseOffset){
+  const { canvas, ctx, texture } = bucket;
+  const w = canvas.width, h = canvas.height;
+  // continu oplopende fase (geen oscillatie) - lust naadloos omdat de kleurenpalet-
+  // functie zelf cyclisch/periodiek is (kleur[laatste] -> kleur[0] sluit vloeiend aan)
+  const travel = now*0.00012*gradSpeed*gradDirection + phaseOffset;
+
+  let grad;
+  if (gradType === 'radial'){
+    const cx = w/2, cy = h/2, r = Math.max(w,h)*0.72;
+    grad = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+  } else if (gradType === 'angular'){
+    const cx = w/2, cy = h/2;
+    grad = ctx.createConicGradient ? ctx.createConicGradient(0, cx, cy)
+                                    : ctx.createRadialGradient(cx,cy,0,cx,cy,Math.max(w,h)*0.72);
+  } else {
+    // lineair - richting instelbaar via gradAngleDeg (0° = van boven naar beneden)
+    const rad = (gradAngleDeg-180) * Math.PI/180;
+    const dx = Math.sin(rad), dy = -Math.cos(rad);
+    const cx = w/2, cy = h/2, len = Math.max(w,h)*0.72;
+    grad = ctx.createLinearGradient(cx-dx*len, cy-dy*len, cx+dx*len, cy+dy*len);
+  }
+
+  for(let i=0;i<=GRADIENT_STOPS;i++){
+    const pos = i/GRADIENT_STOPS;
+    const color = sampleCycleColor(gradColors, pos + travel);
+    grad.addColorStop(pos, color);
+  }
+
+  ctx.filter = gradBlur > 0 ? `blur(${gradBlur}px)` : 'none';
+  ctx.fillStyle = grad;
+  const pad = gradBlur * 1.5;
+  ctx.fillRect(-pad,-pad,w+pad*2,h+pad*2);
+  ctx.filter = 'none';
+
+  if (gradNoise > 0 && noiseCanvas){
+    ctx.save();
+    ctx.globalAlpha = gradNoise;
+    ctx.globalCompositeOperation = 'overlay';
+    const pattern = ctx.createPattern(noiseCanvas, 'repeat');
+    ctx.fillStyle = pattern;
+    ctx.fillRect(0,0,w,h);
+    ctx.restore();
+  }
+
+  texture.needsUpdate = true;
+}
+
+function onResize(){
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+/* ---------------- geometrie: icosaëder + geodetische onderverdeling ---------------- */
+
+function getIcosahedron(){
+  const t = (1 + Math.sqrt(5)) / 2;
+  const rawVerts = [
+    [-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0],
+    [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t],
+    [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]
+  ];
+  const verts = rawVerts.map(v=>{
+    const len = Math.sqrt(v[0]*v[0]+v[1]*v[1]+v[2]*v[2]);
+    return new THREE.Vector3(v[0]/len, v[1]/len, v[2]/len);
+  });
+  const faces = [
+    [0,11,5],[0,5,1],[0,1,7],[0,7,10],[0,10,11],
+    [1,5,9],[5,11,4],[11,10,2],[10,7,6],[7,1,8],
+    [3,9,4],[3,4,2],[3,2,6],[3,6,8],[3,8,9],
+    [4,9,5],[2,4,11],[6,2,10],[8,6,7],[9,8,1]
+  ];
+  return { verts, faces };
+}
+
+function buildGeodesicMesh(m){
+  const ico = getIcosahedron();
+  const posMap = new Map();
+  const globalVerts = [];
+  const globalFaces = [];
+
+  function keyFor(v){ return v.x.toFixed(5)+'_'+v.y.toFixed(5)+'_'+v.z.toFixed(5); }
+  function getGlobalIndex(rawVec){
+    const p = rawVec.clone().normalize().multiplyScalar(R);
+    const key = keyFor(p);
+    if (posMap.has(key)) return posMap.get(key);
+    const idx = globalVerts.length;
+    globalVerts.push(p);
+    posMap.set(key, idx);
+    return idx;
+  }
+
+  ico.faces.forEach(f=>{
+    const A = ico.verts[f[0]], B = ico.verts[f[1]], C = ico.verts[f[2]];
+    const grid = {};
+    for(let i=0;i<=m;i++){
+      for(let j=0;j<=m-i;j++){
+        const w = m-i-j;
+        const raw = new THREE.Vector3(
+          A.x*w+B.x*i+C.x*j,
+          A.y*w+B.y*i+C.y*j,
+          A.z*w+B.z*i+C.z*j
+        );
+        grid[i+'_'+j] = getGlobalIndex(raw);
+      }
+    }
+    for(let i=0;i<m;i++){
+      for(let j=0;j<m-i;j++){
+        const g00 = grid[i+'_'+j];
+        const g10 = grid[(i+1)+'_'+j];
+        const g01 = grid[i+'_'+(j+1)];
+        globalFaces.push([g00,g10,g01]);
+        if (j < m-i-1){
+          const g11 = grid[(i+1)+'_'+(j+1)];
+          globalFaces.push([g10,g11,g01]);
+        }
+      }
+    }
+  });
+
+  return { verts: globalVerts, faces: globalFaces };
+}
+
+function buildDualSeamEdges(mesh){
+  const { verts, faces } = mesh;
+  const vertexIncident = new Map();
+
+  faces.forEach((f, faceId)=>{
+    for(let idx=0; idx<3; idx++){
+      const v = f[idx];
+      const n1 = f[(idx+1)%3];
+      const n2 = f[(idx+2)%3];
+      if (!vertexIncident.has(v)) vertexIncident.set(v, []);
+      vertexIncident.get(v).push({ n1, n2, faceId });
+    }
+  });
+
+  const centroids = faces.map(f=>{
+    return new THREE.Vector3()
+      .add(verts[f[0]]).add(verts[f[1]]).add(verts[f[2]])
+      .divideScalar(3).normalize().multiplyScalar(R);
+  });
+
+  const seamPairs = new Set();
+  const seamEdges = [];
+  const panelPolygons = [];
+
+  vertexIncident.forEach((entries, v)=>{
+    const map = new Map();
+    entries.forEach(e => map.set(e.n1, e));
+    const degree = entries.length;
+    let current = entries[0].n1;
+    const ringFaces = [];
+    const ringVerts = [];
+    for(let k=0;k<degree;k++){
+      ringVerts.push(current);
+      const e = map.get(current);
+      if (!e) break;
+      ringFaces.push(e.faceId);
+      current = e.n2;
+    }
+    if (ringFaces.length === degree){
+      panelPolygons.push({
+        vertexId: v,
+        points: ringFaces.map(fid => centroids[fid]),
+        isPentagon: degree === 5,
+        neighbors: ringVerts.slice()
+      });
+    }
+    for(let k=0;k<ringFaces.length;k++){
+      const f1 = ringFaces[k];
+      const f2 = ringFaces[(k+1)%ringFaces.length];
+      const key = f1<f2 ? f1+'_'+f2 : f2+'_'+f1;
+      if (!seamPairs.has(key)){
+        seamPairs.add(key);
+        seamEdges.push([centroids[f1], centroids[f2]]);
+      }
+    }
+  });
+
+  return { seamEdges, jointPoints: centroids, panelPolygons };
+}
+
+function hexCountForN(m){ return 10*(m*m-1); }
+
+/* ---------------- naadlijnen (buisjes + knooppunten) ---------------- */
+
+function slerpPoints(p1, p2, n){
+  const a = p1.clone().normalize();
+  const b = p2.clone().normalize();
+  const omega = Math.acos(THREE.MathUtils.clamp(a.dot(b), -1, 1));
+  const pts = [];
+  if (omega < 1e-6){
+    for(let k=0;k<=n;k++) pts.push(p1.clone().lerp(p2, k/n));
+    return pts;
+  }
+  const s = Math.sin(omega);
+  for(let k=0;k<=n;k++){
+    const f = k/n;
+    const c1 = Math.sin((1-f)*omega)/s;
+    const c2 = Math.sin(f*omega)/s;
+    pts.push(new THREE.Vector3(
+      a.x*c1+b.x*c2, a.y*c1+b.y*c2, a.z*c1+b.z*c2
+    ).multiplyScalar(R));
+  }
+  return pts;
+}
+
+function mergeCylinderSegments(seamEdges, radius, arcSegments){
+  const positions = [];
+  seamEdges.forEach(([p1,p2])=>{
+    const arc = slerpPoints(p1, p2, arcSegments);
+    for(let k=0;k<arc.length-1;k++){
+      const a = arc[k], b = arc[k+1];
+      const dir = new THREE.Vector3().subVectors(b,a);
+      const len = dir.length();
+      if (len < 1e-6) continue;
+      const geo = new THREE.CylinderGeometry(radius, radius, len, 6, 1);
+      geo.translate(0, len/2, 0);
+      const quat = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+      const m4 = new THREE.Matrix4().compose(a, quat, new THREE.Vector3(1,1,1));
+      geo.applyMatrix4(m4);
+      const flat = geo.index ? geo.toNonIndexed() : geo;
+      const pos = flat.getAttribute('position');
+      for(let i=0;i<pos.count;i++) positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+      geo.dispose();
+    }
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function mergeSpheres(points, radius){
+  const positions = [];
+  points.forEach(p=>{
+    const geo = new THREE.SphereGeometry(radius, 8, 8);
+    geo.translate(p.x, p.y, p.z);
+    const flat = geo.index ? geo.toNonIndexed() : geo;
+    const pos = flat.getAttribute('position');
+    for(let i=0;i<pos.count;i++) positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+    geo.dispose();
+  });
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+function rebuildTubesAndJoints(){
+  if (!currentSeamData) return;
+  if (tubeMesh){ group.remove(tubeMesh); tubeMesh.geometry.dispose(); }
+  if (jointMesh){ group.remove(jointMesh); jointMesh.geometry.dispose(); }
+
+  const arcSegments = 4;
+  const tubeGeo = mergeCylinderSegments(currentSeamData.seamEdges, tubeRadiusVal, arcSegments);
+  tubeMesh = new THREE.Mesh(tubeGeo, seamMaterial);
+  tubeMesh.visible = (viewMode === 'outline');
+  group.add(tubeMesh);
+
+  const jointGeo = mergeSpheres(currentSeamData.jointPoints, tubeRadiusVal*1.3);
+  jointMesh = new THREE.Mesh(jointGeo, seamMaterial);
+  jointMesh.visible = (viewMode === 'outline');
+  group.add(jointMesh);
+}
+
+/* ---------------- panelen (elk hexagon/pentagon toont zijn eigen volledige gradient) ---------------- */
+
+function buildPanelMeshes(panelPolygons, gap){
+  panelMeshes.forEach(m=>{ group.remove(m); m.geometry.dispose(); });
+  panelMeshes = [];
+
+  const scaleFactor = 1 - gap;
+
+  panelPolygons.forEach((poly, panelIndex)=>{
+    const pts = poly.points;
+    const n = pts.length;
+
+    const center = new THREE.Vector3();
+    pts.forEach(p=> center.add(p));
+    center.divideScalar(n);
+
+    const outward = center.clone().normalize();
+    let up = new THREE.Vector3(0,1,0);
+    if (Math.abs(outward.dot(up)) > 0.98) up = new THREE.Vector3(1,0,0);
+    const u = up.clone().cross(outward).normalize();
+    const v = outward.clone().cross(u).normalize();
+
+    const insetPts = pts.map(p=> center.clone().add(p.clone().sub(center).multiplyScalar(scaleFactor)));
+
+    let minX=Infinity, maxX=-Infinity, minY=Infinity, maxY=-Infinity;
+    const local = insetPts.map(p=>{
+      const rel = p.clone().sub(center);
+      const lx = rel.dot(u), ly = rel.dot(v);
+      minX = Math.min(minX, lx); maxX = Math.max(maxX, lx);
+      minY = Math.min(minY, ly); maxY = Math.max(maxY, ly);
+      return [lx, ly];
+    });
+    const rangeX = (maxX - minX) || 1;
+    const rangeY = (maxY - minY) || 1;
+
+    const positions = [center.x, center.y, center.z];
+    const uvs = [0.5, 0.5];
+    insetPts.forEach((p, i)=>{
+      positions.push(p.x, p.y, p.z);
+      const lx = local[i][0], ly = local[i][1];
+      uvs.push(1-(lx-minX)/rangeX, 1-(ly-minY)/rangeY);
+    });
+
+    // check of de "natuurlijke" winding van dit fan-patroon naar buiten of
+    // naar binnen wijst, en draai zo nodig om - dit voorkomt dat de camera
+    // (die van buiten kijkt) de achterkant (en dus een gespiegelde textuur) ziet.
+    const testNormal = new THREE.Vector3()
+      .subVectors(insetPts[0], center)
+      .cross(new THREE.Vector3().subVectors(insetPts[1], center));
+    const reverse = testNormal.dot(outward) < 0;
+
+    const indices = [];
+    for(let i=1;i<=n;i++){
+      const a = i;
+      const b = (i % n) + 1;
+      if (reverse) indices.push(0, b, a);
+      else indices.push(0, a, b);
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+
+    const bucket = gradBuckets[panelIndex % GRAD_BUCKETS];
+    const mesh = new THREE.Mesh(geo, bucket ? bucket.material : undefined);
+    mesh.visible = (viewMode === 'images');
+    panelMeshes.push(mesh);
+    group.add(mesh);
+  });
+}
+
+/* ---------------- opbouwen ---------------- */
+
+function rebuildGeometry(m){
+  document.getElementById('loading').style.opacity = 1;
+  setTimeout(()=>{
+    const mesh = buildGeodesicMesh(m);
+    currentSeamData = buildDualSeamEdges(mesh);
+    rebuildTubesAndJoints();
+    buildPanelMeshes(currentSeamData.panelPolygons, gapValue);
+    document.getElementById('hexVal').textContent = hexCountForN(m);
+    document.getElementById('loading').style.opacity = 0;
+  }, 10);
+}
+
+/* ---------------------- weergave-switch ---------------------- */
+function setViewMode(mode){
+  viewMode = mode;
+  panelMeshes.forEach(mesh => { mesh.visible = (mode === 'images'); });
+  if (tubeMesh) tubeMesh.visible = (mode === 'outline');
+  if (jointMesh) jointMesh.visible = (mode === 'outline');
+  ballMesh.visible = (mode === 'outline');
+
+  document.getElementById('btnImages').classList.toggle('active', mode === 'images');
+  document.getElementById('btnOutline').classList.toggle('active', mode === 'outline');
+  document.getElementById('thickRow').style.display = (mode === 'outline') ? 'block' : 'none';
+}
+
+/* ---------------------- UI-paneel ---------------------- */
+function setupPanel(){
+  const sizeSlider = document.getElementById('sizeSlider');
+  const hexSlider = document.getElementById('hexSlider');
+  const gapSlider = document.getElementById('gapSlider');
+  const thickSlider = document.getElementById('thickSlider');
+  const speedSlider = document.getElementById('speedSlider');
+
+  const sizeVal = document.getElementById('sizeVal');
+  const hexVal = document.getElementById('hexVal');
+  const gapVal = document.getElementById('gapVal');
+  const thickVal = document.getElementById('thickVal');
+  const speedVal = document.getElementById('speedVal');
+
+  hexVal.textContent = hexCountForN(subdivN);
+
+  sizeSlider.addEventListener('input', (e)=>{
+    ballScale = parseFloat(e.target.value);
+    group.scale.setScalar(ballScale);
+    sizeVal.textContent = Math.round(ballScale*100) + '%';
+  });
+
+  hexSlider.addEventListener('change', (e)=>{
+    subdivN = parseInt(e.target.value);
+    rebuildGeometry(subdivN);
+  });
+
+  const rowsSlider = document.getElementById('rowsSlider');
+  const rowsVal = document.getElementById('rowsVal');
+  rowsSlider.addEventListener('input', (e)=>{
+    gridRowCount = parseInt(e.target.value);
+    rowsVal.textContent = gridRowCount;
+    if (bgCtx) resizeBackground();
+  });
+
+  const lanesSlider = document.getElementById('lanesSlider');
+  const lanesVal = document.getElementById('lanesVal');
+  lanesSlider.addEventListener('input', (e)=>{
+    laneCount = parseInt(e.target.value);
+    lanesVal.textContent = laneCount;
+    if (bgCtx){
+      activeRows = pickActiveRows(laneCount, gridRowCount);
+      nextRowSwitch = performance.now() + ROW_SWITCH_INTERVAL;
+    }
+  });
+
+  const staggerSlider = document.getElementById('staggerSlider');
+  const staggerVal = document.getElementById('staggerVal');
+  staggerSlider.addEventListener('input', (e)=>{
+    staggerAmount = parseFloat(e.target.value);
+    staggerVal.textContent = staggerAmount.toFixed(2);
+  });
+
+  const laneSpeedSlider = document.getElementById('laneSpeedSlider');
+  const laneSpeedVal = document.getElementById('laneSpeedVal');
+  laneSpeedSlider.addEventListener('input', (e)=>{
+    laneSpeed = parseFloat(e.target.value);
+    laneSpeedVal.textContent = laneSpeed.toFixed(2);
+  });
+
+  const laneLengthSlider = document.getElementById('laneLengthSlider');
+  const laneLengthVal = document.getElementById('laneLengthVal');
+  laneLengthSlider.addEventListener('input', (e)=>{
+    laneLength = parseFloat(e.target.value);
+    laneLengthVal.textContent = laneLength.toFixed(1);
+  });
+
+  const lengthStaggerSlider = document.getElementById('lengthStaggerSlider');
+  const lengthStaggerVal = document.getElementById('lengthStaggerVal');
+  lengthStaggerSlider.addEventListener('input', (e)=>{
+    lengthStaggerAmount = parseFloat(e.target.value);
+    lengthStaggerVal.textContent = lengthStaggerAmount.toFixed(2);
+  });
+
+  const gradSpeedSlider = document.getElementById('gradSpeedSlider');
+  const gradSpeedVal = document.getElementById('gradSpeedVal');
+  gradSpeedSlider.addEventListener('input', (e)=>{
+    gradSpeed = parseFloat(e.target.value);
+    gradSpeedVal.textContent = gradSpeed.toFixed(2);
+  });
+
+  const gradAngleSlider = document.getElementById('gradAngleSlider');
+  const gradAngleVal = document.getElementById('gradAngleVal');
+  gradAngleSlider.addEventListener('input', (e)=>{
+    gradAngleDeg = parseFloat(e.target.value);
+    gradAngleVal.textContent = Math.round(gradAngleDeg) + '°';
+  });
+
+  const gradStaggerSlider = document.getElementById('gradStaggerSlider');
+  const gradStaggerVal = document.getElementById('gradStaggerVal');
+  gradStaggerSlider.addEventListener('input', (e)=>{
+    gradStagger = parseFloat(e.target.value);
+    gradStaggerVal.textContent = gradStagger.toFixed(2);
+  });
+
+  function setGradType(type){
+    gradType = type;
+    ['btnGradLinear','btnGradRadial','btnGradAngular'].forEach(id=>{
+      document.getElementById(id).classList.remove('active');
+    });
+    const map = { linear:'btnGradLinear', radial:'btnGradRadial', angular:'btnGradAngular' };
+    document.getElementById(map[type]).classList.add('active');
+    document.getElementById('gradAngleRow').style.display = (type === 'linear') ? 'block' : 'none';
+  }
+  document.getElementById('btnGradLinear').addEventListener('click', ()=> setGradType('linear'));
+  document.getElementById('btnGradRadial').addEventListener('click', ()=> setGradType('radial'));
+  document.getElementById('btnGradAngular').addEventListener('click', ()=> setGradType('angular'));
+  setGradType('linear');
+
+  const gradDirToggle = document.getElementById('gradDirToggle');
+  gradDirToggle.addEventListener('click', ()=>{
+    const goingRight = !gradDirToggle.classList.contains('right');
+    gradDirToggle.classList.toggle('right', goingRight);
+    gradDirToggle.classList.toggle('left', !goingRight);
+    gradDirection = goingRight ? -1 : 1;
+  });
+
+  const edgeBlurSlider = document.getElementById('edgeBlurSlider');
+  const edgeBlurVal = document.getElementById('edgeBlurVal');
+  edgeBlurSlider.addEventListener('input', (e)=>{
+    ballEdgeBlur = parseFloat(e.target.value);
+    edgeBlurVal.textContent = ballEdgeBlur.toFixed(1).replace(/\.0$/,'');
+    renderer.domElement.style.filter = ballEdgeBlur > 0 ? `blur(${ballEdgeBlur}px)` : 'none';
+  });
+
+  const gradBlurSlider = document.getElementById('gradBlurSlider');
+  const gradBlurVal = document.getElementById('gradBlurVal');
+  gradBlurSlider.addEventListener('input', (e)=>{
+    gradBlur = parseFloat(e.target.value);
+    gradBlurVal.textContent = gradBlur.toFixed(1).replace(/\.0$/,'');
+  });
+
+  const gradNoiseSlider = document.getElementById('gradNoiseSlider');
+  const gradNoiseVal = document.getElementById('gradNoiseVal');
+  gradNoiseSlider.addEventListener('input', (e)=>{
+    gradNoise = parseFloat(e.target.value);
+    gradNoiseVal.textContent = gradNoise.toFixed(2);
+  });
+
+  const bgVisToggle = document.getElementById('bgVisToggle');
+  bgVisToggle.addEventListener('click', ()=>{
+    const goingRight = !bgVisToggle.classList.contains('right');
+    bgVisToggle.classList.toggle('right', goingRight);
+    bgVisToggle.classList.toggle('left', !goingRight);
+    bgAnimVisible = !goingRight;
+  });
+
+  setupColorPicker();
+
+  document.querySelectorAll('.panel-header[data-target]').forEach(header=>{
+    header.addEventListener('click', ()=>{
+      const panel = document.getElementById(header.dataset.target);
+      panel.classList.toggle('collapsed');
+      const btn = header.querySelector('.collapseBtn');
+      btn.textContent = panel.classList.contains('collapsed') ? '+' : '–';
+    });
+  });
+
+  gapSlider.addEventListener('input', (e)=>{
+    gapValue = parseFloat(e.target.value);
+    gapVal.textContent = gapValue.toFixed(2);
+    if (currentSeamData) buildPanelMeshes(currentSeamData.panelPolygons, gapValue);
+  });
+
+  thickSlider.addEventListener('input', (e)=>{
+    tubeRadiusVal = parseFloat(e.target.value);
+    thickVal.textContent = tubeRadiusVal.toFixed(3);
+  });
+  thickSlider.addEventListener('change', ()=>{
+    rebuildTubesAndJoints();
+  });
+
+  speedSlider.addEventListener('input', (e)=>{
+    rotationSpeed = parseFloat(e.target.value);
+    speedVal.textContent = rotationSpeed.toFixed(4);
+  });
+
+  document.getElementById('btnImages').addEventListener('click', ()=> setViewMode('images'));
+  document.getElementById('btnOutline').addEventListener('click', ()=> setViewMode('outline'));
+
+  const dirToggle = document.getElementById('dirToggle');
+  dirToggle.addEventListener('click', ()=>{
+    const goingRight = !dirToggle.classList.contains('right');
+    dirToggle.classList.toggle('right', goingRight);
+    dirToggle.classList.toggle('left', !goingRight);
+    rotationDirection = goingRight ? -1 : 1;
+  });
+}
+
+/* -------------------- custom color picker (matcht de rest van de UI) -------------------- */
+
+function hsvToRgb(h,s,v){
+  h = ((h%360)+360)%360;
+  const c = v*s;
+  const x = c*(1-Math.abs((h/60)%2-1));
+  const m = v-c;
+  let r,g,b;
+  if(h<60){ r=c;g=x;b=0; } else if(h<120){ r=x;g=c;b=0; }
+  else if(h<180){ r=0;g=c;b=x; } else if(h<240){ r=0;g=x;b=c; }
+  else if(h<300){ r=x;g=0;b=c; } else { r=c;g=0;b=x; }
+  return { r:Math.round((r+m)*255), g:Math.round((g+m)*255), b:Math.round((b+m)*255) };
+}
+
+function rgbToHsv(r,g,b){
+  r/=255; g/=255; b/=255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0;
+  if(d!==0){
+    if(max===r) h=60*(((g-b)/d)%6);
+    else if(max===g) h=60*((b-r)/d+2);
+    else h=60*((r-g)/d+4);
+  }
+  if(h<0) h+=360;
+  const s = max===0 ? 0 : d/max;
+  return { h, s, v:max };
+}
+
+function rgbToHex(r,g,b){
+  const h = n => n.toString(16).padStart(2,'0');
+  return '#'+h(r)+h(g)+h(b);
+}
+
+function setupColorPicker(){
+  const colorTargets = {
+    gradA: { get:()=>gradColors[0], set:v=>{gradColors[0]=v;}, label:'Kleur A', swatch:'swatchGradA' },
+    gradB: { get:()=>gradColors[1], set:v=>{gradColors[1]=v;}, label:'Kleur B', swatch:'swatchGradB' },
+    gradC: { get:()=>gradColors[2], set:v=>{gradColors[2]=v;}, label:'Kleur C', swatch:'swatchGradC' },
+    gradD: { get:()=>gradColors[3], set:v=>{gradColors[3]=v;}, label:'Kleur D', swatch:'swatchGradD' },
+    gradE: { get:()=>gradColors[4], set:v=>{gradColors[4]=v;}, label:'Kleur E', swatch:'swatchGradE' },
+    bg:    { get:()=>bgColor,       set:v=>{bgColor=v;},       label:'Vormenkleur', swatch:'swatchBg' },
+    bgPage:{ get:()=>bgPageColor,   set:v=>{bgPageColor=v;},   label:'Achtergrondkleur', swatch:'swatchBgPage' }
+  };
+
+  const popup = document.getElementById('colorPopup');
+  const svCanvas = document.getElementById('svCanvas');
+  const svCtx = svCanvas.getContext('2d');
+  const hueCanvas = document.getElementById('hueCanvas');
+  const hueCtx = hueCanvas.getContext('2d');
+  const hexInput = document.getElementById('hexInput');
+  const title = document.getElementById('colorPopupTitle');
+
+  let currentKey = null;
+  let hsv = { h:0, s:0, v:0 };
+
+  function drawHue(){
+    const w = hueCanvas.width, h = hueCanvas.height;
+    const grad = hueCtx.createLinearGradient(0,0,w,0);
+    for(let i=0;i<=6;i++){
+      const rgb = hsvToRgb(i*60,1,1);
+      grad.addColorStop(i/6, `rgb(${rgb.r},${rgb.g},${rgb.b})`);
+    }
+    hueCtx.fillStyle = grad;
+    hueCtx.fillRect(0,0,w,h);
+    const x = (hsv.h/360)*w;
+    hueCtx.strokeStyle = '#fff';
+    hueCtx.lineWidth = 2;
+    hueCtx.strokeRect(x-2,0,4,h);
+  }
+
+  function drawSV(){
+    const w = svCanvas.width, h = svCanvas.height;
+    const base = hsvToRgb(hsv.h,1,1);
+    svCtx.fillStyle = `rgb(${base.r},${base.g},${base.b})`;
+    svCtx.fillRect(0,0,w,h);
+    const gradWhite = svCtx.createLinearGradient(0,0,w,0);
+    gradWhite.addColorStop(0,'rgba(255,255,255,1)');
+    gradWhite.addColorStop(1,'rgba(255,255,255,0)');
+    svCtx.fillStyle = gradWhite;
+    svCtx.fillRect(0,0,w,h);
+    const gradBlack = svCtx.createLinearGradient(0,0,0,h);
+    gradBlack.addColorStop(0,'rgba(0,0,0,0)');
+    gradBlack.addColorStop(1,'rgba(0,0,0,1)');
+    svCtx.fillStyle = gradBlack;
+    svCtx.fillRect(0,0,w,h);
+
+    const cx = hsv.s*w, cy = (1-hsv.v)*h;
+    svCtx.beginPath();
+    svCtx.arc(cx,cy,6,0,Math.PI*2);
+    svCtx.strokeStyle = '#fff';
+    svCtx.lineWidth = 2;
+    svCtx.stroke();
+    svCtx.beginPath();
+    svCtx.arc(cx,cy,6,0,Math.PI*2);
+    svCtx.strokeStyle = 'rgba(0,0,0,0.5)';
+    svCtx.lineWidth = 1;
+    svCtx.stroke();
+  }
+
+  function applyColor(hex, updateInputs){
+    if (!currentKey) return;
+    colorTargets[currentKey].set(hex);
+    const swatchEl = document.getElementById(colorTargets[currentKey].swatch);
+    if (swatchEl) swatchEl.style.background = hex;
+    if (updateInputs !== false) hexInput.value = hex;
+  }
+
+  function updateFromHSV(){
+    const rgb = hsvToRgb(hsv.h,hsv.s,hsv.v);
+    applyColor(rgbToHex(rgb.r,rgb.g,rgb.b));
+  }
+
+  function positionPopup(){
+    const container = document.getElementById('panelsContainer');
+    const rect = container.getBoundingClientRect();
+    let left = rect.right + 12;
+    let top = rect.top;
+    if (left + 210 > window.innerWidth) left = window.innerWidth - 210;
+    if (top + 340 > window.innerHeight) top = Math.max(8, window.innerHeight - 340);
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  }
+
+  function openPicker(key){
+    currentKey = key;
+    const hex = colorTargets[key].get();
+    const rgb = hexToRgb(hex);
+    hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+    title.textContent = colorTargets[key].label;
+    hexInput.value = hex;
+    positionPopup();
+    popup.style.display = 'block';
+    drawHue();
+    drawSV();
+  }
+
+  function closePicker(){
+    popup.style.display = 'none';
+    currentKey = null;
+  }
+
+  Object.keys(colorTargets).forEach(key=>{
+    const el = document.getElementById(colorTargets[key].swatch);
+    if (!el) return;
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      if (currentKey === key && popup.style.display === 'block'){ closePicker(); return; }
+      openPicker(key);
+    });
+  });
+
+  document.getElementById('colorPopupClose').addEventListener('click', closePicker);
+
+  document.addEventListener('pointerdown', (e)=>{
+    if (popup.style.display !== 'block') return;
+    if (popup.contains(e.target)) return;
+    if (e.target.classList && e.target.classList.contains('swatch')) return;
+    closePicker();
+  });
+
+  let svDragging = false;
+  function handleSV(e){
+    const rect = svCanvas.getBoundingClientRect();
+    const x = Math.min(Math.max(e.clientX-rect.left,0), rect.width);
+    const y = Math.min(Math.max(e.clientY-rect.top,0), rect.height);
+    hsv.s = x/rect.width;
+    hsv.v = 1-(y/rect.height);
+    drawSV();
+    updateFromHSV();
+  }
+  svCanvas.addEventListener('pointerdown', (e)=>{ svDragging=true; svCanvas.setPointerCapture(e.pointerId); handleSV(e); });
+  svCanvas.addEventListener('pointermove', (e)=>{ if(svDragging) handleSV(e); });
+  svCanvas.addEventListener('pointerup', ()=>{ svDragging=false; });
+
+  let hueDragging = false;
+  function handleHue(e){
+    const rect = hueCanvas.getBoundingClientRect();
+    const x = Math.min(Math.max(e.clientX-rect.left,0), rect.width);
+    hsv.h = (x/rect.width)*360;
+    drawHue();
+    drawSV();
+    updateFromHSV();
+  }
+  hueCanvas.addEventListener('pointerdown', (e)=>{ hueDragging=true; hueCanvas.setPointerCapture(e.pointerId); handleHue(e); });
+  hueCanvas.addEventListener('pointermove', (e)=>{ if(hueDragging) handleHue(e); });
+  hueCanvas.addEventListener('pointerup', ()=>{ hueDragging=false; });
+
+  hexInput.addEventListener('input', ()=>{
+    let val = hexInput.value.trim();
+    if (val[0] !== '#') val = '#'+val;
+    if (/^#[0-9a-fA-F]{6}$/.test(val)){
+      const rgb = hexToRgb(val);
+      hsv = rgbToHsv(rgb.r, rgb.g, rgb.b);
+      drawHue();
+      drawSV();
+      applyColor(val, false);
+    }
+  });
+}
+
+/* -------------------- interactie: slepen om te draaien, automatisch verder draaien -------------------- */
+function addControls(){
+  let dragging = false;
+  let prevX = 0, prevY = 0;
+
+  const dom = renderer.domElement;
+
+  dom.addEventListener('pointerdown', (e)=>{
+    dragging = true;
+    prevX = e.clientX; prevY = e.clientY;
+    dom.setPointerCapture(e.pointerId);
+  });
+  dom.addEventListener('pointermove', (e)=>{
+    if(!dragging) return;
+    const dx = e.clientX - prevX;
+    const dy = e.clientY - prevY;
+    prevX = e.clientX; prevY = e.clientY;
+    group.rotation.y += dx * 0.006;
+    group.rotation.x += dy * 0.006;
+  });
+  window.addEventListener('pointerup', ()=>{ dragging = false; });
+
+  dom.addEventListener('wheel', (e)=>{
+    e.preventDefault();
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z + e.deltaY*0.003, 3.2, 12);
+  }, { passive:false });
+
+  window.__ballControls = () => {
+    if(!dragging){
+      group.rotation.y += rotationSpeed * rotationDirection;
+    }
+  };
+}
+
+/* ---------------------------------------------------------
+   Bewegende achtergrond, opgebouwd zoals in Cavalry:
+   1. Een vaste basis-cluster van 5 vormen (zie referentie),
+      die onderling random van vorm wisselen. Een
+      visibility-sequence binnen de cluster zorgt dat er
+      steeds één vorm tijdelijk onzichtbaar is.
+   2. Deze cluster wordt over een raster (kolommen x rijen)
+      getild, elke instantie met een eigen tijd-offset zodat
+      alle clusters net iets anders animeren.
+   3. Over dat hele raster loopt een reizende visibility-golf
+      (diagonaal), die per cluster de helderheid moduleert -
+      dat geeft het effect van "snelheidsbanen" die door het
+      scherm vliegen.
+--------------------------------------------------------- */
+
+function buildShapePaths(){
+  // exacte paden uit de aangeleverde SVG's (viewBox 0 0 250 250)
+  bgShapePaths = [
+    { type:'circle' },
+    { type:'path', path: new Path2D('M250 62.5 187.5 0 125 62.5 62.5 0 0 62.5 62.5 125 0 187.5 62.5 250 125 187.5 187.5 250 250 187.5 187.5 125 250 62.5Z') }, // cross
+    { type:'path', path: new Path2D('M163.78,250h-77.56C86.22,202.38,47.62,163.78,0,163.78v-77.56C47.62,86.22,86.22,47.62,86.22,0h77.56c0,47.62,38.6,86.22,86.22,86.22v77.56c-47.62,0-86.22,38.6-86.22,86.22Z') }, // flower
+    { type:'path', path: new Path2D('M125,250h0C55.96,250,0,194.04,0,125V0h125C194.04,0,250,55.96,250,125h0c0,69.04-55.96,125-125,125Z') }, // ghost
+    { type:'path', path: new Path2D('M184.88,250h-119.76C39.69,224.57,25.43,210.31,0,184.88v-119.76C25.43,39.69,39.69,25.43,65.12,0h119.76c25.43,25.43,39.69,39.69,65.12,65.12v119.76c-25.43,25.43-39.69,39.69-65.12,65.12Z') }, // sign
+    { type:'rect' } // block
+  ];
+}
+
+function randInt(n){ return Math.floor(Math.random()*n); }
+function randRange(min,max){ return min + Math.random()*(max-min); }
+
+function makeSlotVisibility(now){
+  const visible = Math.random() < 0.75;
+  return {
+    visible,
+    nextToggle: now + (visible ? randRange(SLOT_SHOW_MIN,SLOT_SHOW_MAX) : randRange(SLOT_HIDE_MIN,SLOT_HIDE_MAX))
+  };
+}
+
+function makeCluster(gx, gy, now){
+  const jitterX = (Math.random()-0.5) * 24;
+  const jitterY = (Math.random()-0.5) * 24;
+  return {
+    gx, gy,
+    offsetX: jitterX, offsetY: jitterY,
+    shapeOrder: shuffleArray(CLUSTER_SHAPE_SET.slice()),
+    nextShapeChange: now + SHAPE_CHANGE_MIN + Math.random()*(SHAPE_CHANGE_MAX-SHAPE_CHANGE_MIN),
+    slotVis: [0,1,2,3,4].map(()=> makeSlotVisibility(now))
+  };
+}
+
+function initBackground(){
+  bgCanvas = document.getElementById('bgCanvas');
+  bgCtx = bgCanvas.getContext('2d');
+  buildShapePaths();
+  resizeBackground();
+  window.addEventListener('resize', resizeBackground);
+  requestAnimationFrame(bgLoop);
+}
+
+function resizeBackground(){
+  const dpr = Math.min(window.devicePixelRatio, 2);
+  const w = window.innerWidth, h = window.innerHeight;
+  bgCanvas.width = w*dpr;
+  bgCanvas.height = h*dpr;
+  bgCanvas.style.width = w+'px';
+  bgCanvas.style.height = h+'px';
+  bgCtx.setTransform(dpr,0,0,dpr,0,0);
+
+  clusterPitch = h/gridRowCount;
+  clusterSize = clusterPitch*0.8;
+  const cellSize = clusterSize/3;
+  slotSize = cellSize * (1 - 2*CELL_MARGIN);
+
+  const now = performance.now();
+  const cols = Math.ceil(w/clusterPitch)+2;
+  const rows = gridRowCount+2;
+  bgCols = cols; bgRows = rows;
+
+  clusters = [];
+  for(let row=-1; row<rows-1; row++){
+    for(let col=-1; col<cols-1; col++){
+      clusters.push(makeCluster(col, row, now));
+    }
+  }
+
+  rowPhaseSeed = [];
+  rowLengthSeed = [];
+  for(let r=0; r<gridRowCount; r++){
+    rowPhaseSeed.push(Math.random());
+    rowLengthSeed.push(Math.random());
+  }
+
+  activeRows = pickActiveRows(laneCount, gridRowCount);
+  nextRowSwitch = now + ROW_SWITCH_INTERVAL;
+}
+
+function drawShape(ctx, def, size){
+  ctx.save();
+  const s = size/250;
+  ctx.scale(s, s);
+  ctx.beginPath();
+  if (def.type === 'circle'){
+    ctx.arc(125,125,125,0,Math.PI*2);
+    ctx.fill();
+  } else if (def.type === 'rect'){
+    ctx.fillRect(0,0,250,250);
+  } else {
+    ctx.fill(def.path);
+  }
+  ctx.restore();
+}
+
+function shuffleArray(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = randInt(i+1);
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+
+// kiest 'count' rijen uit 0..totalRows-1 met minimaal 1 rij ruimte ertussen
+function pickActiveRows(count, totalRows){
+  const options = shuffleArray([...Array(totalRows).keys()]);
+  const chosen = [];
+  for(const r of options){
+    if (chosen.every(c => Math.abs(c-r) >= 2)){
+      chosen.push(r);
+      if (chosen.length >= count) break;
+    }
+  }
+  return new Set(chosen);
+}
+
+function updateActiveRows(now){
+  if (now < nextRowSwitch) return;
+  activeRows = pickActiveRows(laneCount, gridRowCount);
+  nextRowSwitch = now + ROW_SWITCH_INTERVAL;
+}
+
+function cometLit(gx, cols, now, direction, rowIndex){
+  const phaseSeed = rowPhaseSeed[rowIndex] || 0;
+  const lengthSeed = rowLengthSeed[rowIndex] || 0;
+  const cycle = COMET_CYCLE_BASE / Math.max(0.05, laneSpeed);
+  const staggeredNow = now + phaseSeed*staggerAmount*cycle;
+  const winLen = Math.max(0.4, laneLength * (1 + (lengthSeed-0.5)*2*lengthStaggerAmount));
+  for(let i=0;i<COMETS_PER_ROW;i++){
+    const phase = ((staggeredNow + i*(cycle/COMETS_PER_ROW)) % cycle) / cycle;
+    const travel = phase*(cols + winLen*2) - winLen;
+    const pos = direction >= 0 ? travel : (cols-1-travel);
+    if (gx >= pos && gx <= pos+winLen) return true;
+  }
+  return false;
+}
+
+function bgLoop(now){
+  requestAnimationFrame(bgLoop);
+  if (!bgCtx) return;
+
+  bgCtx.fillStyle = bgPageColor;
+  bgCtx.fillRect(0,0,window.innerWidth, window.innerHeight);
+
+  if (!bgAnimVisible) return;
+
+  updateActiveRows(now);
+  const direction = rotationDirection; // volgt de draairichting van de bal
+  bgCtx.fillStyle = bgColor;
+
+  for(let i=0;i<clusters.length;i++){
+    const c = clusters[i];
+    if (!activeRows.has(c.gy)) continue;
+    if (!cometLit(c.gx, bgCols, now, direction, c.gy)) continue;
+
+    if (now >= c.nextShapeChange){
+      c.shapeOrder = shuffleArray(CLUSTER_SHAPE_SET.slice());
+      c.nextShapeChange = now + SHAPE_CHANGE_MIN + Math.random()*(SHAPE_CHANGE_MAX-SHAPE_CHANGE_MIN);
+    }
+
+    const originX = c.gx*clusterPitch + c.offsetX;
+    const originY = c.gy*clusterPitch + c.offsetY;
+
+    for(let s=0; s<5; s++){
+      const sv = c.slotVis[s];
+      if (now >= sv.nextToggle){
+        sv.visible = !sv.visible;
+        sv.nextToggle = now + (sv.visible ? randRange(SLOT_SHOW_MIN,SLOT_SHOW_MAX) : randRange(SLOT_HIDE_MIN,SLOT_HIDE_MAX));
+      }
+      if (!sv.visible) continue;
+
+      const frac = CLUSTER_SLOTS[s];
+      const cx = originX + frac.x*clusterSize;
+      const cy = originY + frac.y*clusterSize;
+
+      bgCtx.save();
+      bgCtx.translate(cx - slotSize/2, cy - slotSize/2);
+      drawShape(bgCtx, bgShapePaths[c.shapeOrder[s]], slotSize);
+      bgCtx.restore();
+    }
+  }
+}
+
+function animate(now){
+  requestAnimationFrame(animate);
+  if(window.__ballControls) window.__ballControls();
+  drawAllGradients(now || 0);
+  renderer.render(scene, camera);
+}
+</script>
+</body>
+</html>
