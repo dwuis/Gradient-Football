@@ -23,6 +23,11 @@
     display:flex; flex-direction:column; gap:12px;
   }
   #panelsContainerRight .panel { width:230px; }
+  #panelsContainerBottomRight {
+    position:fixed; bottom:16px; right:16px; z-index:2;
+    display:flex; flex-direction:column; gap:12px;
+  }
+  #panelsContainerBottomRight .panel { width:230px; }
   .panel {
     font-family: 'DM Sans', sans-serif;
     background: rgba(0, 0, 0, 0.95);
@@ -337,19 +342,15 @@
 </div>
 
 <div id="panelsContainerRight">
-  <div class="panel" id="panelSphere">
+  <div class="panel collapsed" id="panelSphere">
     <div class="panel-header" data-target="panelSphere">
       <span>Sphere</span>
-      <button class="collapseBtn">–</button>
+      <button class="collapseBtn">+</button>
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Aantal cirkels <span class="val" id="auraCountVal">24</span></label>
-        <input type="range" id="auraCountSlider" min="8" max="64" step="1" value="24">
-      </div>
-      <div class="row">
-        <label>Grootte sphere <span class="val" id="auraSizeVal">3.50</span></label>
-        <input type="range" id="auraSizeSlider" min="2.2" max="6" step="0.05" value="3.5">
+        <label>Grootte sphere <span class="val" id="auraSizeVal">1.50</span></label>
+        <input type="range" id="auraSizeSlider" min="1.5" max="6" step="0.05" value="1.5">
       </div>
       <div class="row">
         <label>Rotatie sphere X <span class="val" id="auraRotXVal">0°</span></label>
@@ -367,51 +368,41 @@
         <label>Draaisnelheid sphere <span class="val" id="auraSpinSpeedVal">0.0030</span></label>
         <input type="range" id="auraSpinSpeedSlider" min="0" max="0.02" step="0.0005" value="0.003">
       </div>
-      <div class="row">
-        <label>Draairichting sphere</label>
-        <div id="auraSpinDirToggle" class="toggle-track left">
-          <div class="toggle-thumb"></div>
-          <div class="toggle-labels">
-            <span>Met de klok mee</span>
-            <span>Tegen de klok in</span>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="panel" id="panelLineStyle">
+  <div class="panel collapsed" id="panelLineStyle">
     <div class="panel-header" data-target="panelLineStyle">
       <span>Lijnstijl</span>
-      <button class="collapseBtn">–</button>
+      <button class="collapseBtn">+</button>
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Lijndikte cirkels <span class="val" id="auraThickVal">0.0120</span></label>
-        <input type="range" id="auraThickSlider" min="0.0015" max="0.05" step="0.0005" value="0.012">
+        <label>Lijndikte cirkels <span class="val" id="auraThickVal">0.0020</span></label>
+        <input type="range" id="auraThickSlider" min="0.0015" max="0.05" step="0.0005" value="0.002">
       </div>
       <div class="row">
-        <label>Sterkte dikte-stagger <span class="val" id="auraThickStaggerVal">0.60</span></label>
-        <input type="range" id="auraThickStaggerSlider" min="0" max="1" step="0.05" value="0.6">
+        <label>Sterkte dikte-stagger <span class="val" id="auraThickStaggerVal">0.20</span></label>
+        <input type="range" id="auraThickStaggerSlider" min="0" max="1" step="0.05" value="0.2">
       </div>
       <div class="row">
         <label>Kleuren (gradient)</label>
         <div class="swatch-group">
           <div class="swatch-item">
             <span class="swatch-label">A</span>
-            <button class="swatch" id="swatchAuraGradA" data-target="auraGradA" style="background:#000000"></button>
+            <button class="swatch" id="swatchAuraGradA" data-target="auraGradA" style="background:#DCDCDC"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">B</span>
-            <button class="swatch" id="swatchAuraGradB" data-target="auraGradB" style="background:#190076"></button>
+            <button class="swatch" id="swatchAuraGradB" data-target="auraGradB" style="background:#C3B6FB"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">C</span>
-            <button class="swatch" id="swatchAuraGradC" data-target="auraGradC" style="background:#e9ffc4"></button>
+            <button class="swatch" id="swatchAuraGradC" data-target="auraGradC" style="background:#E1FEB2"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">D</span>
-            <button class="swatch" id="swatchAuraGradD" data-target="auraGradD" style="background:#ad0037"></button>
+            <button class="swatch" id="swatchAuraGradD" data-target="auraGradD" style="background:#FFE4ED"></button>
           </div>
         </div>
       </div>
@@ -422,19 +413,23 @@
     </div>
   </div>
 
-  <div class="panel" id="panelAura">
+  <div class="panel collapsed" id="panelAura">
     <div class="panel-header" data-target="panelAura">
       <span>Sequence</span>
-      <button class="collapseBtn">–</button>
+      <button class="collapseBtn">+</button>
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Zichtbare cirkels per stap <span class="val" id="auraVisibleCountVal">6</span></label>
-        <input type="range" id="auraVisibleCountSlider" min="1" max="24" step="1" value="6">
+        <label>Aantal cirkels <span class="val" id="auraCountVal">54</span></label>
+        <input type="range" id="auraCountSlider" min="8" max="64" step="1" value="54">
       </div>
       <div class="row">
-        <label>Snelheid sequence <span class="val" id="auraSpeedVal">4.00</span></label>
-        <input type="range" id="auraSpeedSlider" min="0" max="40" step="0.1" value="4">
+        <label>Zichtbare cirkels per stap <span class="val" id="auraVisibleCountVal">43</span></label>
+        <input type="range" id="auraVisibleCountSlider" min="1" max="64" step="1" value="43">
+      </div>
+      <div class="row">
+        <label>Snelheid sequence <span class="val" id="auraSpeedVal">40.00</span></label>
+        <input type="range" id="auraSpeedSlider" min="0" max="40" step="0.1" value="40">
       </div>
       <div class="row">
         <label>Richting sequence</label>
@@ -449,6 +444,80 @@
     </div>
   </div>
 
+  <div class="panel collapsed" id="panelIconGrid">
+    <div class="panel-header" data-target="panelIconGrid">
+      <span>Icon-grid</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <label>Icons breedte <span class="val" id="iconColsVal">6</span></label>
+        <input type="range" id="iconColsSlider" min="1" max="20" step="1" value="6">
+      </div>
+      <div class="row">
+        <label>Icons hoogte <span class="val" id="iconRowsVal">4</span></label>
+        <input type="range" id="iconRowsSlider" min="1" max="20" step="1" value="4">
+      </div>
+      <div class="row">
+        <label>Zichtbaar tegelijk <span class="val" id="iconVisibleCountVal">6</span></label>
+        <input type="range" id="iconVisibleCountSlider" min="1" max="24" step="1" value="6">
+      </div>
+      <div class="row">
+        <label>Snelheid sequence <span class="val" id="iconSpeedVal">4.00</span></label>
+        <input type="range" id="iconSpeedSlider" min="0" max="80" step="0.1" value="4">
+      </div>
+      <div class="row">
+        <label>Willekeur volgorde <span class="val" id="iconRandomnessVal">0.00</span></label>
+        <input type="range" id="iconRandomnessSlider" min="0" max="1" step="0.05" value="0">
+      </div>
+      <div class="row">
+        <label>Kleur</label>
+        <button class="swatch" id="swatchIconColor" data-target="iconColor" style="background:#ffffff; width:56px; height:56px; aspect-ratio:auto;"></button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="panelsContainerBottomRight">
+  <div class="panel collapsed" id="panelVisibility">
+    <div class="panel-header" data-target="panelVisibility">
+      <span>Zichtbaarheid</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <label>Bal</label>
+        <div id="ballVisToggle" class="toggle-track left">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Zichtbaar</span>
+            <span>Verborgen</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Sphere</label>
+        <div id="sphereVisToggle" class="toggle-track left">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Zichtbaar</span>
+            <span>Verborgen</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <label>Icon-grid</label>
+        <div id="iconGridVisToggle" class="toggle-track left">
+          <div class="toggle-thumb"></div>
+          <div class="toggle-labels">
+            <span>Zichtbaar</span>
+            <span>Verborgen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div id="colorPopup" class="panel" style="position:fixed; display:none; width:200px; z-index:5;">
@@ -508,22 +577,35 @@ let rotationDirection = 1;
 // ------ onzichtbare sphere met daaromheen verdeelde cirkels ------
 let auraGroup = null, auraSpinGroup = null, auraSphereMesh = null;
 let auraCircles = [];
-let auraCircleCount = 24;      // via slider: 8 - 64
-let auraSphereRadius = 3.5;    // via slider: grootte van de onzichtbare sphere
-let auraSequenceSpeed = 4.0;   // via slider: snelheid van de visibility-travel (cirkels/seconde)
+let auraCircleCount = 54;      // via slider: 8 - 64
+let auraSphereRadius = 1.5;    // via slider: grootte van de onzichtbare sphere
+let auraSequenceSpeed = 40.0;  // via slider: snelheid van de visibility-travel (cirkels/seconde)
 let auraSequenceDirection = 1; // via toggle: 1 = voorwaarts, -1 = achterwaarts
 let auraPhase = 0;             // huidige positie van de "kop" van de sequence, in cirkel-index-eenheden
 let lastAuraNow = 0;
-let auraTubeRadius = 0.012;    // via slider: lijndikte van de cirkels
-let auraGradColors = ['#000000', '#190076', '#e9ffc4', '#ad0037']; // via kleurkiezer, standaard gelijk aan hexagon-gradient
+let auraTubeRadius = 0.002;    // via slider: lijndikte van de cirkels
+let auraGradColors = ['#DCDCDC', '#C3B6FB', '#E1FEB2', '#FFE4ED']; // via kleurkiezer
 let auraGradStagger = 0.3;     // via slider: offset tussen de gradient-rotatie van de verschillende cirkels
-let auraVisibleCount = 6;      // via slider: aantal gelijktijdig zichtbare cirkels per animatie-stap (min. 1)
+let auraVisibleCount = 43;     // via slider: aantal gelijktijdig zichtbare cirkels per animatie-stap (min. 1)
 let auraRotX = 0, auraRotY = 0, auraRotZ = 0; // via sliders: statische kanteling van de onzichtbare sphere (radialen)
 let auraSpinSpeed = 0.003;     // via slider: eigen, doorlopende draaisnelheid van de sphere - los van de bal
-let auraSpinDirection = 1;     // via toggle: 1 = met de klok mee, -1 = tegen de klok in
-let auraThicknessStagger = 0.6; // via slider: sterkte van het dikte-verloop over de zichtbare cirkels (laag-hoog-laag)
+let auraThicknessStagger = 0.2; // via slider: sterkte van het dikte-verloop over de zichtbare cirkels (laag-hoog-laag)
 const AURA_THICKNESS_LEVELS = 9;      // aantal voorgebouwde dikte-varianten per cirkel
 const AURA_MIN_THICKNESS_FACTOR = 0.12; // laagste dikte als fractie van de ingestelde lijndikte
+
+// ------ icon-grid: het beeldmerk verdeeld over een grid op de achtergrond ------
+let iconImage = null;        // gerasterde versie van het beeldmerk (opnieuw getekend bij kleurwissel)
+let iconColor = '#ffffff';   // via kleurkiezer
+let iconGridCols = 6;        // via slider: aantal icons over de breedte
+let iconGridRows = 4;        // via slider: aantal icons over de hoogte
+let iconVisibleCount = 6;    // via slider: aantal gelijktijdig zichtbare icons per animatie-stap (min. 1)
+let iconSequenceSpeed = 4.0; // via slider: snelheid van de visibility-travel (icons/seconde)
+let iconPhase = 0;
+let lastIconNow = 0;
+let iconGridVisible = true;  // via toggle in het zichtbaarheidspaneel
+let iconRandomness = 0;      // via slider: 0 = nette volgorde, hoger = meer willekeur in waar icons verschijnen
+let iconRandomOrder = [];    // vaste, geshuffelde volgorde - opnieuw gegenereerd zodra het grid van formaat verandert
+const ICON_ASPECT = 768/1366; // hoogte/breedte-verhouding van het beeldmerk
 
 // ------ gradient-animatie binnen de bal ------
 let gradBuckets = [];
@@ -637,6 +719,10 @@ function init(){
   auraSpinGroup.add(auraSphereMesh);
 
   buildAuraCircles(auraCircleCount, auraSphereRadius);
+
+  // icon-grid: rasterize het beeldmerk één keer, daarna wordt het grid getekend in bgLoop()
+  loadIconImage(iconColor, img=>{ iconImage = img; });
+  buildIconRandomOrder();
 
   group.rotation.set(0.35, -0.6, 0.1);
 
@@ -912,6 +998,66 @@ function updateAuraAnimation(now){
   }
 }
 
+/* ---------------- icon-grid: beeldmerk verdeeld over een grid op de achtergrond ---------------- */
+
+// rasterized het meegeleverde beeldmerk (SVG) in de gekozen kleur naar een <img>,
+// klaar om elk frame met ctx.drawImage() getekend te worden op het achtergrond-canvas.
+function loadIconImage(colorHex, onReady){
+  const svgMarkup = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1366 768">'
+    + '<path fill="' + colorHex + '" d="M414.31,255.07c-3.33,2.25-30.19,33.84-35.05,39.51-8.73,10.2-15.79,20.05-23.67,30.38-28.72,37.65-64.35,110.9-32.49,156.87,41.23,59.49,132.9,28,191.86,3.06l180.04-77.55c40.16-17.02,79.7-33.85,119.91-51.58,20.12-8.85,39.6-16.92,59.75-25.73,39.06-17.12,81.31-35.52,120.29-51.75,5.31-2.2,57.13-25.02,60.49-25.79-1.69-.93-3.79.06-6.03.7-62.7,17.63-127.94,33.73-189.96,51.6l-98.06,26.66-196.01,53.2c-42.13,11.38-114.13,37.32-152.37,7.3-28.95-22.8-29.39-59.66-18.1-93.37,2.59-7.77,5.27-15.34,8.84-22.59l10.57-20.91h0Z"/>'
+    + '</svg>';
+  const img = new Image();
+  img.onload = () => onReady(img);
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgMarkup);
+}
+
+// genereert een vaste, geshuffelde volgorde voor het huidige aantal cellen - wordt gebruikt
+// om de nette index-volgorde te vermengen met willekeur (zie iconRandomness)
+function buildIconRandomOrder(){
+  const n = Math.max(1, iconGridCols * iconGridRows);
+  iconRandomOrder = shuffleArray([...Array(n).keys()]);
+}
+
+// schuift de "kop" van de visibility-sequence door de grid-cellen (rij voor rij, index-volgorde),
+// loopt eindeloos door - zelfde soort mechaniek als bij de cirkels op de sphere.
+function updateIconGridPhase(now){
+  if (!lastIconNow) lastIconNow = now;
+  const deltaSec = Math.min(0.1, Math.max(0, (now - lastIconNow) / 1000));
+  lastIconNow = now;
+  const n = Math.max(1, iconGridCols * iconGridRows);
+  iconPhase = (iconPhase + iconSequenceSpeed * deltaSec) % n;
+  if (iconPhase < 0) iconPhase += n;
+}
+
+// tekent het grid op het achtergrond-canvas; alleen de cellen binnen het zichtbare venster
+// rond de huidige fase worden getekend (harde cuts, geen fade).
+function drawIconGrid(ctx, w, h){
+  if (!iconGridVisible || !iconImage) return;
+  const cols = Math.max(1, iconGridCols), rows = Math.max(1, iconGridRows);
+  const n = cols*rows;
+  const windowHalfWidth = Math.max(0.5, Math.min(n, iconVisibleCount) / 2);
+  const cellW = w/cols, cellH = h/rows;
+
+  let fw = cellW*0.6, fh = fw*ICON_ASPECT;
+  if (fh > cellH*0.6){ fh = cellH*0.6; fw = fh/ICON_ASPECT; }
+
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<cols;c++){
+      const idx = r*cols + c;
+      // 'iconRandomness' vermengt de nette index-volgorde met een vaste, geshuffelde volgorde:
+      // op 0 verschijnen de icons keurig op volgorde, hoe hoger hoe willekeuriger de plek
+      // waar het volgende icon opduikt.
+      const shuffledIdx = iconRandomOrder.length === n ? iconRandomOrder[idx] : idx;
+      const effIdx = idx*(1-iconRandomness) + shuffledIdx*iconRandomness;
+      let d = Math.abs(effIdx - iconPhase);
+      d = Math.min(d, n - d); // kortste afstand op de "ring" van indices, zodat de golf naadloos loopt
+      if (d >= windowHalfWidth) continue;
+      const cx = cellW*(c+0.5), cy = cellH*(r+0.5);
+      ctx.drawImage(iconImage, cx-fw/2, cy-fh/2, fw, fh);
+    }
+  }
+}
+
 /* ---------------- geometrie: icosaëder + geodetische onderverdeling ---------------- */
 
 function getIcosahedron(){
@@ -979,7 +1125,38 @@ function buildGeodesicMesh(m){
     }
   });
 
+  // sferische relaxatie: de platte barycentrische onderverdeling van elk driehoekige
+  // icosaëder-vlak wordt bij projectie op de bol ongelijkmatig - vlakken/hoekpunten
+  // dichter bij de rand van elk oorspronkelijk driehoeksvlak worden samengedrukt. Dat
+  // geeft (via de duale opbouw hieronder) hexagons van wisselende grootte en vorm.
+  // Door elk hoekpunt een paar keer licht richting het gemiddelde van zijn buren te
+  // trekken en daarna weer terug op de bol te projecteren, vereffenen de driehoeken -
+  // en dus de hexagons - zonder de icosaëdrische symmetrie te verliezen.
+  relaxSphericalMesh(globalVerts, globalFaces, 8, 0.5);
+
   return { verts: globalVerts, faces: globalFaces };
+}
+
+function relaxSphericalMesh(verts, faces, iterations, strength){
+  const neighbors = verts.map(()=> new Set());
+  faces.forEach(f=>{
+    const [a,b,c] = f;
+    neighbors[a].add(b); neighbors[a].add(c);
+    neighbors[b].add(a); neighbors[b].add(c);
+    neighbors[c].add(a); neighbors[c].add(b);
+  });
+
+  for(let iter=0; iter<iterations; iter++){
+    const relaxed = verts.map((v, idx)=>{
+      const nbrs = neighbors[idx];
+      if (!nbrs.size) return v.clone();
+      const avg = new THREE.Vector3();
+      nbrs.forEach(nIdx => avg.add(verts[nIdx]));
+      avg.divideScalar(nbrs.size);
+      return v.clone().lerp(avg, strength).normalize().multiplyScalar(R);
+    });
+    for(let i=0;i<verts.length;i++) verts[i].copy(relaxed[i]);
+  }
 }
 
 function buildDualSeamEdges(mesh){
@@ -1485,14 +1662,6 @@ function setupPanel(){
     auraSpinSpeedVal.textContent = auraSpinSpeed.toFixed(4);
   });
 
-  const auraSpinDirToggle = document.getElementById('auraSpinDirToggle');
-  auraSpinDirToggle.addEventListener('click', ()=>{
-    const goingRight = !auraSpinDirToggle.classList.contains('right');
-    auraSpinDirToggle.classList.toggle('right', goingRight);
-    auraSpinDirToggle.classList.toggle('left', !goingRight);
-    auraSpinDirection = goingRight ? -1 : 1;
-  });
-
   setupColorPicker();
 
   document.querySelectorAll('.panel-header[data-target]').forEach(header=>{
@@ -1560,6 +1729,80 @@ function setupPanel(){
     group.rotation.z = THREE.MathUtils.degToRad(deg);
     ballRotZVal.textContent = Math.round(deg) + '°';
   });
+
+  const iconColsSlider = document.getElementById('iconColsSlider');
+  const iconColsVal = document.getElementById('iconColsVal');
+  const iconRowsSlider = document.getElementById('iconRowsSlider');
+  const iconRowsVal = document.getElementById('iconRowsVal');
+  const iconVisibleCountSlider = document.getElementById('iconVisibleCountSlider');
+  const iconVisibleCountVal = document.getElementById('iconVisibleCountVal');
+
+  function syncIconVisibleBounds(){
+    const maxVisible = Math.max(1, iconGridCols * iconGridRows);
+    iconVisibleCountSlider.max = maxVisible;
+    if (iconVisibleCount > maxVisible) iconVisibleCount = maxVisible;
+    iconVisibleCountSlider.value = iconVisibleCount;
+    iconVisibleCountVal.textContent = iconVisibleCount;
+  }
+
+  iconColsSlider.addEventListener('input', (e)=>{
+    iconGridCols = parseInt(e.target.value);
+    iconColsVal.textContent = iconGridCols;
+    syncIconVisibleBounds();
+    buildIconRandomOrder();
+  });
+
+  iconRowsSlider.addEventListener('input', (e)=>{
+    iconGridRows = parseInt(e.target.value);
+    iconRowsVal.textContent = iconGridRows;
+    syncIconVisibleBounds();
+    buildIconRandomOrder();
+  });
+  syncIconVisibleBounds();
+
+  iconVisibleCountSlider.addEventListener('input', (e)=>{
+    iconVisibleCount = parseInt(e.target.value);
+    iconVisibleCountVal.textContent = iconVisibleCount;
+  });
+
+  const iconRandomnessSlider = document.getElementById('iconRandomnessSlider');
+  const iconRandomnessVal = document.getElementById('iconRandomnessVal');
+  iconRandomnessSlider.addEventListener('input', (e)=>{
+    iconRandomness = parseFloat(e.target.value);
+    iconRandomnessVal.textContent = iconRandomness.toFixed(2);
+  });
+
+  const iconSpeedSlider = document.getElementById('iconSpeedSlider');
+  const iconSpeedVal = document.getElementById('iconSpeedVal');
+  iconSpeedSlider.addEventListener('input', (e)=>{
+    iconSequenceSpeed = parseFloat(e.target.value);
+    iconSpeedVal.textContent = iconSequenceSpeed.toFixed(2);
+  });
+
+  // individuele zichtbaarheid: bal, sphere en icon-grid elk apart aan/uit
+  const ballVisToggle = document.getElementById('ballVisToggle');
+  ballVisToggle.addEventListener('click', ()=>{
+    const goingRight = !ballVisToggle.classList.contains('right');
+    ballVisToggle.classList.toggle('right', goingRight);
+    ballVisToggle.classList.toggle('left', !goingRight);
+    group.visible = !goingRight;
+  });
+
+  const sphereVisToggle = document.getElementById('sphereVisToggle');
+  sphereVisToggle.addEventListener('click', ()=>{
+    const goingRight = !sphereVisToggle.classList.contains('right');
+    sphereVisToggle.classList.toggle('right', goingRight);
+    sphereVisToggle.classList.toggle('left', !goingRight);
+    if (auraGroup) auraGroup.visible = !goingRight;
+  });
+
+  const iconGridVisToggle = document.getElementById('iconGridVisToggle');
+  iconGridVisToggle.addEventListener('click', ()=>{
+    const goingRight = !iconGridVisToggle.classList.contains('right');
+    iconGridVisToggle.classList.toggle('right', goingRight);
+    iconGridVisToggle.classList.toggle('left', !goingRight);
+    iconGridVisible = !goingRight;
+  });
 }
 
 /* -------------------- custom color picker (matcht de rest van de UI) -------------------- */
@@ -1607,7 +1850,8 @@ function setupColorPicker(){
     auraGradA: { get:()=>auraGradColors[0], set:v=>{auraGradColors[0]=v;}, label:'Cirkel kleur A', swatch:'swatchAuraGradA' },
     auraGradB: { get:()=>auraGradColors[1], set:v=>{auraGradColors[1]=v;}, label:'Cirkel kleur B', swatch:'swatchAuraGradB' },
     auraGradC: { get:()=>auraGradColors[2], set:v=>{auraGradColors[2]=v;}, label:'Cirkel kleur C', swatch:'swatchAuraGradC' },
-    auraGradD: { get:()=>auraGradColors[3], set:v=>{auraGradColors[3]=v;}, label:'Cirkel kleur D', swatch:'swatchAuraGradD' }
+    auraGradD: { get:()=>auraGradColors[3], set:v=>{auraGradColors[3]=v;}, label:'Cirkel kleur D', swatch:'swatchAuraGradD' },
+    iconColor: { get:()=>iconColor, set:v=>{ iconColor=v; loadIconImage(iconColor, img=>{ iconImage = img; }); }, label:'Kleur beeldmerk', swatch:'swatchIconColor' }
   };
 
   const popup = document.getElementById('colorPopup');
@@ -1967,6 +2211,9 @@ function bgLoop(now){
   bgCtx.fillStyle = bgPageColor;
   bgCtx.fillRect(0,0,window.innerWidth, window.innerHeight);
 
+  updateIconGridPhase(now);
+  drawIconGrid(bgCtx, window.innerWidth, window.innerHeight);
+
   if (!bgAnimVisible) return;
 
   updateActiveRows(now);
@@ -2012,8 +2259,8 @@ function animate(now){
   if(auraSpinGroup){
     // NIET om de Y-as: de cirkels zijn breedtecirkels rond precies die as, dus daar
     // omheen draaien is onzichtbaar (rotatie-symmetrisch). X/Z geeft een zichtbare tuimeling.
-    auraSpinGroup.rotation.x += auraSpinSpeed * auraSpinDirection;
-    auraSpinGroup.rotation.z += auraSpinSpeed * auraSpinDirection * 0.6;
+    auraSpinGroup.rotation.x += auraSpinSpeed;
+    auraSpinGroup.rotation.z += auraSpinSpeed * 0.6;
   }
   drawAllGradients(now || 0);
   updateAuraAnimation(now || performance.now());
