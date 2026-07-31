@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
-<head>
+<html lang="nl"><head>
 <meta charset="UTF-8">
 <title>Voetbal - 3D</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&family=DM+Sans:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500&display=swap');
 
   html, body { margin:0; padding:0; overflow:hidden; background:#000000; height:100%; }
   canvas { display:block; touch-action:none; }
@@ -28,6 +27,15 @@
     display:flex; flex-direction:column; gap:12px;
   }
   #panelsContainerBottomRight .panel { width:230px; }
+  #saveSettingsBtn {
+    position:fixed; bottom:16px; left:16px; z-index:3;
+    background:#ffffff; color:#000000; border:none; padding:13px 20px;
+    font-family:'DM Sans', sans-serif; font-weight:500; font-size:12px;
+    letter-spacing:0.06em; text-transform:uppercase; cursor:pointer;
+    border-radius:2px; box-shadow:0 2px 10px rgba(0,0,0,0.4);
+  }
+  #saveSettingsBtn:hover { background:#e6e6e6; }
+  #saveSettingsBtn:active { transform:translateY(1px); }
   .panel {
     font-family: 'DM Sans', sans-serif;
     background: rgba(0, 0, 0, 0.95);
@@ -79,7 +87,7 @@
     padding:9px 6px; border-radius:0; cursor:pointer; font-family:'DM Mono', monospace;
     text-transform:uppercase; letter-spacing:0.03em; transition:background 0.15s, color 0.15s;
   }
-  #viewSwitch button.active { background:#ff1901; color:#000; font-weight:400; }
+  #viewSwitch button.active { background:#ffffff; color:#000; font-weight:400; }
   #gradTypeSwitch {
     display:flex; background:rgba(255,255,255,0.06); border-radius:0; padding:3px; gap:3px;
     width:100%; box-sizing:border-box;
@@ -89,7 +97,7 @@
     padding:9px 4px; border-radius:0; cursor:pointer; font-family:'DM Mono', monospace;
     text-transform:uppercase; letter-spacing:0.02em; transition:background 0.15s, color 0.15s;
   }
-  #gradTypeSwitch button.active { background:#ff1901; color:#000; font-weight:400; }
+  #gradTypeSwitch button.active { background:#ffffff; color:#000; font-weight:400; }
   input.color-input {
     -webkit-appearance:none; appearance:none; width:100%; height:32px;
     border:1px solid rgba(255,255,255,0.25); background:none; padding:2px; cursor:pointer;
@@ -113,6 +121,12 @@
     font-size:12px; padding:8px 10px; text-transform:uppercase; letter-spacing:0.03em;
   }
   .hex-input:focus { outline:none; border-color:#ff1901; }
+  .text-input {
+    width:100%; box-sizing:border-box; background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.25); color:#fff; font-family:'DM Mono', monospace;
+    font-size:13px; padding:9px 10px; letter-spacing:0.02em;
+  }
+  .text-input:focus { outline:none; border-color:#ff1901; }
   #colorPopup .panel-header { cursor:default; }
   .toggle-track {
     position:relative; width:100%; height:34px; background:rgba(255,255,255,0.06);
@@ -120,7 +134,7 @@
   }
   .toggle-thumb {
     position:absolute; top:3px; left:3px; width:calc(50% - 3px); height:28px;
-    background:#ff1901; transition:left 0.18s ease;
+    background:#ffffff; transition:left 0.18s ease;
   }
   .toggle-track.right .toggle-thumb { left:50%; }
   .toggle-labels { position:relative; z-index:1; display:flex; height:100%; }
@@ -139,7 +153,8 @@
 </style>
 </head>
 <body>
-<canvas id="bgCanvas"></canvas>
+<canvas id="bgCanvas" width="2880" height="1508" style="width: 1440px; height: 754px;"></canvas>
+<button id="saveSettingsBtn">Instellingen opslaan</button>
 <div id="panelsContainer">
 
   <div class="panel collapsed" id="panelBall">
@@ -155,12 +170,12 @@
         </div>
       </div>
       <div class="row">
-        <label>Grootte bal <span class="val" id="sizeVal">100%</span></label>
-        <input type="range" id="sizeSlider" min="0.5" max="2" step="0.01" value="1">
+        <label>Grootte bal <span class="val" id="sizeVal">86%</span></label>
+        <input type="range" id="sizeSlider" min="0.5" max="2" step="0.01" value="0.86">
       </div>
       <div class="row">
-        <label>Aantal hexagons <span class="val" id="hexVal">150</span></label>
-        <input type="range" id="hexSlider" min="2" max="5" step="1" value="4">
+        <label>Aantal hexagons <span class="val" id="hexVal">80</span></label>
+        <input type="range" id="hexSlider" min="2" max="5" step="1" value="3">
       </div>
       <div class="row">
         <label>Tussenruimte panelen <span class="val" id="gapVal">0.00</span></label>
@@ -198,72 +213,16 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Rotatie bal X <span class="val" id="ballRotXVal">20°</span></label>
+        <label>Rotatie bal X <span class="val" id="ballRotXVal">23°</span></label>
         <input type="range" id="ballRotXSlider" min="-180" max="180" step="1" value="20">
       </div>
       <div class="row">
-        <label>Rotatie bal Y <span class="val" id="ballRotYVal">-34°</span></label>
+        <label>Rotatie bal Y <span class="val" id="ballRotYVal">3464°</span></label>
         <input type="range" id="ballRotYSlider" min="-180" max="180" step="1" value="-34">
       </div>
       <div class="row">
         <label>Rotatie bal Z <span class="val" id="ballRotZVal">6°</span></label>
         <input type="range" id="ballRotZSlider" min="-180" max="180" step="1" value="6">
-      </div>
-    </div>
-  </div>
-
-  <div class="panel collapsed" id="panelBg">
-    <div class="panel-header" data-target="panelBg">
-      <span>Achtergrond</span>
-      <button class="collapseBtn">+</button>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <label>Aantal rijen <span class="val" id="rowsVal">6</span></label>
-        <input type="range" id="rowsSlider" min="2" max="14" step="1" value="6">
-      </div>
-      <div class="row">
-        <label>Aantal geanimeerde banen <span class="val" id="lanesVal">2</span></label>
-        <input type="range" id="lanesSlider" min="1" max="5" step="1" value="2">
-      </div>
-      <div class="row">
-        <label>Stagger banen <span class="val" id="staggerVal">0.30</span></label>
-        <input type="range" id="staggerSlider" min="0" max="1" step="0.05" value="0.3">
-      </div>
-      <div class="row">
-        <label>Snelheid banen <span class="val" id="laneSpeedVal">1.00</span></label>
-        <input type="range" id="laneSpeedSlider" min="0.1" max="3" step="0.05" value="1">
-      </div>
-      <div class="row">
-        <label>Lengte banen <span class="val" id="laneLengthVal">2.4</span></label>
-        <input type="range" id="laneLengthSlider" min="0.5" max="10" step="0.1" value="2.4">
-      </div>
-      <div class="row">
-        <label>Stagger lengtes <span class="val" id="lengthStaggerVal">0.30</span></label>
-        <input type="range" id="lengthStaggerSlider" min="0" max="1" step="0.05" value="0.3">
-      </div>
-      <div class="row">
-        <label>Animatie</label>
-        <div id="bgVisToggle" class="toggle-track right">
-          <div class="toggle-thumb"></div>
-          <div class="toggle-labels">
-            <span>Zichtbaar</span>
-            <span>Verborgen</span>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <label>Kleur</label>
-        <div class="swatch-group">
-          <div class="swatch-item">
-            <span class="swatch-label">Vormen</span>
-            <button class="swatch" id="swatchBg" data-target="bg" style="background:#190076"></button>
-          </div>
-          <div class="swatch-item">
-            <span class="swatch-label">Achtergrond</span>
-            <button class="swatch" id="swatchBgPage" data-target="bgPage" style="background:#000000"></button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -282,17 +241,17 @@
           <button id="btnGradAngular">Angulair</button>
         </div>
       </div>
-      <div class="row" id="gradAngleRow">
-        <label>Hoek <span class="val" id="gradAngleVal">0°</span></label>
-        <input type="range" id="gradAngleSlider" min="0" max="360" step="1" value="0">
+      <div class="row" id="gradAngleRow" style="display: block;">
+        <label>Hoek <span class="val" id="gradAngleVal">14°</span></label>
+        <input type="range" id="gradAngleSlider" min="0" max="360" step="1" value="40">
       </div>
       <div class="row">
-        <label>Snelheid <span class="val" id="gradSpeedVal">1.00</span></label>
-        <input type="range" id="gradSpeedSlider" min="0" max="6" step="0.05" value="1">
+        <label>Snelheid <span class="val" id="gradSpeedVal">3.00</span></label>
+        <input type="range" id="gradSpeedSlider" min="0" max="6" step="0.05" value="2.65">
       </div>
       <div class="row">
-        <label>Stagger hexagons <span class="val" id="gradStaggerVal">0.00</span></label>
-        <input type="range" id="gradStaggerSlider" min="0" max="1" step="0.05" value="0">
+        <label>Stagger hexagons <span class="val" id="gradStaggerVal">0.35</span></label>
+        <input type="range" id="gradStaggerSlider" min="0" max="1" step="0.05" value="0.35">
       </div>
       <div class="row">
         <label>Richting</label>
@@ -309,31 +268,31 @@
         <input type="range" id="gradBlurSlider" min="0" max="20" step="0.5" value="11">
       </div>
       <div class="row">
-        <label>Noise <span class="val" id="gradNoiseVal">0.25</span></label>
-        <input type="range" id="gradNoiseSlider" min="0" max="1" step="0.05" value="0.25">
+        <label>Noise <span class="val" id="gradNoiseVal">0.40</span></label>
+        <input type="range" id="gradNoiseSlider" min="0" max="1" step="0.05" value="0.4">
       </div>
       <div class="row">
         <label>Kleuren</label>
         <div class="swatch-group">
           <div class="swatch-item">
             <span class="swatch-label">A</span>
-            <button class="swatch" id="swatchGradA" data-target="gradA" style="background:#000000"></button>
+            <button class="swatch" id="swatchGradA" data-target="gradA" style="background: rgb(0, 0, 0);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">B</span>
-            <button class="swatch" id="swatchGradB" data-target="gradB" style="background:#190076"></button>
+            <button class="swatch" id="swatchGradB" data-target="gradB" style="background: rgb(255, 28, 0);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">C</span>
-            <button class="swatch" id="swatchGradC" data-target="gradC" style="background:#e9ffc4"></button>
+            <button class="swatch" id="swatchGradC" data-target="gradC" style="background: rgb(255, 238, 116);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">D</span>
-            <button class="swatch" id="swatchGradD" data-target="gradD" style="background:#ad0037"></button>
+            <button class="swatch" id="swatchGradD" data-target="gradD" style="background: rgb(255, 74, 74);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">E</span>
-            <button class="swatch" id="swatchGradE" data-target="gradE" style="background:#4000a3"></button>
+            <button class="swatch" id="swatchGradE" data-target="gradE" style="background: rgb(102, 0, 0);"></button>
           </div>
         </div>
       </div>
@@ -349,24 +308,24 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Grootte sphere <span class="val" id="auraSizeVal">1.50</span></label>
-        <input type="range" id="auraSizeSlider" min="1.5" max="6" step="0.05" value="1.5">
+        <label>Grootte sphere <span class="val" id="auraSizeVal">2.05</span></label>
+        <input type="range" id="auraSizeSlider" min="1.5" max="6" step="0.05" value="2.05">
       </div>
       <div class="row">
-        <label>Rotatie sphere X <span class="val" id="auraRotXVal">0°</span></label>
-        <input type="range" id="auraRotXSlider" min="-180" max="180" step="1" value="0">
+        <label>Rotatie sphere X <span class="val" id="auraRotXVal">-57°</span></label>
+        <input type="range" id="auraRotXSlider" min="-180" max="180" step="1" value="-57">
       </div>
       <div class="row">
-        <label>Rotatie sphere Y <span class="val" id="auraRotYVal">0°</span></label>
-        <input type="range" id="auraRotYSlider" min="-180" max="180" step="1" value="0">
+        <label>Rotatie sphere Y <span class="val" id="auraRotYVal">-63°</span></label>
+        <input type="range" id="auraRotYSlider" min="-180" max="180" step="1" value="-63">
       </div>
       <div class="row">
-        <label>Rotatie sphere Z <span class="val" id="auraRotZVal">0°</span></label>
-        <input type="range" id="auraRotZSlider" min="-180" max="180" step="1" value="0">
+        <label>Rotatie sphere Z <span class="val" id="auraRotZVal">73°</span></label>
+        <input type="range" id="auraRotZSlider" min="-180" max="180" step="1" value="73">
       </div>
       <div class="row">
-        <label>Draaisnelheid sphere <span class="val" id="auraSpinSpeedVal">0.0030</span></label>
-        <input type="range" id="auraSpinSpeedSlider" min="0" max="0.02" step="0.0005" value="0.003">
+        <label>Draaisnelheid sphere <span class="val" id="auraSpinSpeedVal">0.0000</span></label>
+        <input type="range" id="auraSpinSpeedSlider" min="0" max="0.02" step="0.0005" value="0">
       </div>
     </div>
   </div>
@@ -378,37 +337,37 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Lijndikte cirkels <span class="val" id="auraThickVal">0.0020</span></label>
-        <input type="range" id="auraThickSlider" min="0.0015" max="0.05" step="0.0005" value="0.002">
+        <label>Lijndikte cirkels <span class="val" id="auraThickVal">0.0015</span></label>
+        <input type="range" id="auraThickSlider" min="0.0015" max="0.05" step="0.0005" value="0.0015">
       </div>
       <div class="row">
-        <label>Sterkte dikte-stagger <span class="val" id="auraThickStaggerVal">0.20</span></label>
-        <input type="range" id="auraThickStaggerSlider" min="0" max="1" step="0.05" value="0.2">
+        <label>Sterkte dikte-stagger <span class="val" id="auraThickStaggerVal">1.00</span></label>
+        <input type="range" id="auraThickStaggerSlider" min="0" max="1" step="0.05" value="0.9">
       </div>
       <div class="row">
         <label>Kleuren (gradient)</label>
         <div class="swatch-group">
           <div class="swatch-item">
             <span class="swatch-label">A</span>
-            <button class="swatch" id="swatchAuraGradA" data-target="auraGradA" style="background:#DCDCDC"></button>
+            <button class="swatch" id="swatchAuraGradA" data-target="auraGradA" style="background: rgb(0, 255, 123);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">B</span>
-            <button class="swatch" id="swatchAuraGradB" data-target="auraGradB" style="background:#C3B6FB"></button>
+            <button class="swatch" id="swatchAuraGradB" data-target="auraGradB" style="background: rgb(120, 0, 255);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">C</span>
-            <button class="swatch" id="swatchAuraGradC" data-target="auraGradC" style="background:#E1FEB2"></button>
+            <button class="swatch" id="swatchAuraGradC" data-target="auraGradC" style="background: rgb(229, 172, 255);"></button>
           </div>
           <div class="swatch-item">
             <span class="swatch-label">D</span>
-            <button class="swatch" id="swatchAuraGradD" data-target="auraGradD" style="background:#FFE4ED"></button>
+            <button class="swatch" id="swatchAuraGradD" data-target="auraGradD" style="background: rgb(128, 252, 193);"></button>
           </div>
         </div>
       </div>
       <div class="row">
-        <label>Stagger cirkel-rotatie <span class="val" id="auraGradStaggerVal">0.30</span></label>
-        <input type="range" id="auraGradStaggerSlider" min="0" max="1" step="0.05" value="0.3">
+        <label>Stagger cirkel-rotatie <span class="val" id="auraGradStaggerVal">1.00</span></label>
+        <input type="range" id="auraGradStaggerSlider" min="0" max="1" step="0.05" value="0.8">
       </div>
     </div>
   </div>
@@ -420,12 +379,12 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Aantal cirkels <span class="val" id="auraCountVal">54</span></label>
-        <input type="range" id="auraCountSlider" min="8" max="64" step="1" value="54">
+        <label>Aantal cirkels <span class="val" id="auraCountVal">64</span></label>
+        <input type="range" id="auraCountSlider" min="8" max="64" step="1" value="57">
       </div>
       <div class="row">
-        <label>Zichtbare cirkels per stap <span class="val" id="auraVisibleCountVal">43</span></label>
-        <input type="range" id="auraVisibleCountSlider" min="1" max="64" step="1" value="43">
+        <label>Zichtbare cirkels per stap <span class="val" id="auraVisibleCountVal">26</span></label>
+        <input type="range" id="auraVisibleCountSlider" min="1" max="64" step="1" value="26">
       </div>
       <div class="row">
         <label>Snelheid sequence <span class="val" id="auraSpeedVal">40.00</span></label>
@@ -451,28 +410,61 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <label>Icons breedte <span class="val" id="iconColsVal">6</span></label>
-        <input type="range" id="iconColsSlider" min="1" max="20" step="1" value="6">
+        <label>Icons breedte <span class="val" id="iconColsVal">15</span></label>
+        <input type="range" id="iconColsSlider" min="1" max="20" step="1" value="15">
       </div>
       <div class="row">
-        <label>Icons hoogte <span class="val" id="iconRowsVal">4</span></label>
-        <input type="range" id="iconRowsSlider" min="1" max="20" step="1" value="4">
+        <label>Icons hoogte <span class="val" id="iconRowsVal">15</span></label>
+        <input type="range" id="iconRowsSlider" min="1" max="20" step="1" value="15">
       </div>
       <div class="row">
-        <label>Zichtbaar tegelijk <span class="val" id="iconVisibleCountVal">6</span></label>
-        <input type="range" id="iconVisibleCountSlider" min="1" max="24" step="1" value="6">
+        <label>Zichtbaar tegelijk <span class="val" id="iconVisibleCountVal">26</span></label>
+        <input type="range" id="iconVisibleCountSlider" min="1" max="225" step="1" value="26">
       </div>
       <div class="row">
-        <label>Snelheid sequence <span class="val" id="iconSpeedVal">4.00</span></label>
-        <input type="range" id="iconSpeedSlider" min="0" max="80" step="0.1" value="4">
+        <label>Snelheid sequence <span class="val" id="iconSpeedVal">80.00</span></label>
+        <input type="range" id="iconSpeedSlider" min="0" max="80" step="0.1" value="80">
       </div>
       <div class="row">
-        <label>Willekeur volgorde <span class="val" id="iconRandomnessVal">0.00</span></label>
-        <input type="range" id="iconRandomnessSlider" min="0" max="1" step="0.05" value="0">
+        <label>Willekeur volgorde <span class="val" id="iconRandomnessVal">0.25</span></label>
+        <input type="range" id="iconRandomnessSlider" min="0" max="1" step="0.05" value="0.25">
       </div>
       <div class="row">
         <label>Kleur</label>
         <button class="swatch" id="swatchIconColor" data-target="iconColor" style="background:#ffffff; width:56px; height:56px; aspect-ratio:auto;"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel collapsed" id="panelGlitch">
+    <div class="panel-header" data-target="panelGlitch">
+      <span>Glitch</span>
+      <button class="collapseBtn">+</button>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <label>Breedte glitch <span class="val" id="glitchWidthVal">0.055</span></label>
+        <input type="range" id="glitchWidthSlider" min="0" max="0.3" step="0.005" value="0.055">
+      </div>
+      <div class="row">
+        <label>Hoogte glitch <span class="val" id="glitchHeightVal">0.185</span></label>
+        <input type="range" id="glitchHeightSlider" min="0" max="0.3" step="0.005" value="0.26">
+      </div>
+      <div class="row">
+        <label>Frequentie glitch <span class="val" id="glitchFreqVal">2.0</span>s</label>
+        <input type="range" id="glitchFreqSlider" min="0.5" max="20" step="0.1" value="2">
+      </div>
+      <div class="row">
+        <label>Onregelmatigheid <span class="val" id="glitchIrregularityVal">1.00</span></label>
+        <input type="range" id="glitchIrregularitySlider" min="0" max="1" step="0.05" value="1">
+      </div>
+      <div class="row">
+        <label>Grofheid displacement <span class="val" id="glitchCoarsenessVal">4</span></label>
+        <input type="range" id="glitchCoarsenessSlider" min="1" max="20" step="1" value="3">
+      </div>
+      <div class="row">
+        <label>Snelheid glitch-animatie <span class="val" id="glitchAnimSpeedVal">0.85</span></label>
+        <input type="range" id="glitchAnimSpeedSlider" min="0.1" max="4" step="0.05" value="1">
       </div>
     </div>
   </div>
@@ -520,9 +512,9 @@
   </div>
 </div>
 
-<div id="colorPopup" class="panel" style="position:fixed; display:none; width:200px; z-index:5;">
+<div id="colorPopup" class="panel" style="position: fixed; display: none; width: 200px; z-index: 5; left: 258px; top: 16px;">
   <div class="panel-header" id="colorPopupHeader">
-    <span id="colorPopupTitle">Kleur</span>
+    <span id="colorPopupTitle">Kleur D</span>
     <button class="collapseBtn" id="colorPopupClose">×</button>
   </div>
   <div class="panel-body">
@@ -539,7 +531,7 @@
   </div>
 </div>
 
-<div id="loading">bezig met opbouwen…</div>
+<div id="loading" style="opacity: 0;">bezig met opbouwen…</div>
 <div id="hint">Sleep om te draaien · scroll om te zoomen</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -566,57 +558,60 @@ let panelMeshes = [];
 
 const seamMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
-let ballScale = 1.0;
-let subdivN = 4;
+let ballScale = 0.86;
+let subdivN = 3;
 let viewMode = 'images'; // 'images' | 'outline'
-let gapValue = 0.0;
+let gapValue = 0;
 let tubeRadiusVal = 0.003;
 let rotationSpeed = 0.0028;
 let rotationDirection = 1;
+let ballRotX = 22.73857, ballRotY = 5168.70648, ballRotZ = 5.73; // graden: startkanteling van de bal
 
 // ------ onzichtbare sphere met daaromheen verdeelde cirkels ------
 let auraGroup = null, auraSpinGroup = null, auraSphereMesh = null;
 let auraCircles = [];
-let auraCircleCount = 54;      // via slider: 8 - 64
-let auraSphereRadius = 1.5;    // via slider: grootte van de onzichtbare sphere
-let auraSequenceSpeed = 40.0;  // via slider: snelheid van de visibility-travel (cirkels/seconde)
+let auraCircleCount = 64;      // via slider: 8 - 64
+let auraSphereRadius = 2.05;   // via slider: grootte van de onzichtbare sphere
+let auraSequenceSpeed = 40;  // via slider: snelheid van de visibility-travel (cirkels/seconde)
 let auraSequenceDirection = 1; // via toggle: 1 = voorwaarts, -1 = achterwaarts
 let auraPhase = 0;             // huidige positie van de "kop" van de sequence, in cirkel-index-eenheden
 let lastAuraNow = 0;
-let auraTubeRadius = 0.002;    // via slider: lijndikte van de cirkels
-let auraGradColors = ['#DCDCDC', '#C3B6FB', '#E1FEB2', '#FFE4ED']; // via kleurkiezer
-let auraGradStagger = 0.3;     // via slider: offset tussen de gradient-rotatie van de verschillende cirkels
-let auraVisibleCount = 43;     // via slider: aantal gelijktijdig zichtbare cirkels per animatie-stap (min. 1)
-let auraRotX = 0, auraRotY = 0, auraRotZ = 0; // via sliders: statische kanteling van de onzichtbare sphere (radialen)
-let auraSpinSpeed = 0.003;     // via slider: eigen, doorlopende draaisnelheid van de sphere - los van de bal
-let auraThicknessStagger = 0.2; // via slider: sterkte van het dikte-verloop over de zichtbare cirkels (laag-hoog-laag)
+let auraTubeRadius = 0.0015;   // via slider: lijndikte van de cirkels
+let auraGradColors = ['#00ff7b', '#7800ff', '#e5acff', '#80fcc1']; // via kleurkiezer
+let auraGradStagger = 1;     // via slider: offset tussen de gradient-rotatie van de verschillende cirkels
+let auraVisibleCount = 26;     // via slider: aantal gelijktijdig zichtbare cirkels per animatie-stap (min. 1)
+let auraRotX = -57, auraRotY = -63, auraRotZ = 73; // via sliders: statische kanteling van de onzichtbare sphere (graden)
+let auraSpinSpeed = 0;         // via slider: eigen, doorlopende draaisnelheid van de sphere - los van de bal
+let auraThicknessStagger = 1; // via slider: sterkte van het dikte-verloop over de zichtbare cirkels (laag-hoog-laag)
 const AURA_THICKNESS_LEVELS = 9;      // aantal voorgebouwde dikte-varianten per cirkel
 const AURA_MIN_THICKNESS_FACTOR = 0.12; // laagste dikte als fractie van de ingestelde lijndikte
 
 // ------ icon-grid: het beeldmerk verdeeld over een grid op de achtergrond ------
 let iconImage = null;        // gerasterde versie van het beeldmerk (opnieuw getekend bij kleurwissel)
 let iconColor = '#ffffff';   // via kleurkiezer
-let iconGridCols = 6;        // via slider: aantal icons over de breedte
-let iconGridRows = 4;        // via slider: aantal icons over de hoogte
-let iconVisibleCount = 6;    // via slider: aantal gelijktijdig zichtbare icons per animatie-stap (min. 1)
-let iconSequenceSpeed = 4.0; // via slider: snelheid van de visibility-travel (icons/seconde)
+let iconGridCols = 15;       // via slider: aantal icons over de breedte
+let iconGridRows = 15;       // via slider: aantal icons over de hoogte
+let iconVisibleCount = 26;   // via slider: aantal gelijktijdig zichtbare icons per animatie-stap (min. 1)
+let iconSequenceSpeed = 80; // via slider: snelheid van de visibility-travel (icons/seconde)
 let iconPhase = 0;
 let lastIconNow = 0;
 let iconGridVisible = true;  // via toggle in het zichtbaarheidspaneel
-let iconRandomness = 0;      // via slider: 0 = nette volgorde, hoger = meer willekeur in waar icons verschijnen
+let ballVisible = true;      // via toggle in het zichtbaarheidspaneel
+let sphereVisible = true;    // via toggle in het zichtbaarheidspaneel
+let iconRandomness = 0.25;   // via slider: 0 = nette volgorde, hoger = meer willekeur in waar icons verschijnen
 let iconRandomOrder = [];    // vaste, geshuffelde volgorde - opnieuw gegenereerd zodra het grid van formaat verandert
 const ICON_ASPECT = 768/1366; // hoogte/breedte-verhouding van het beeldmerk
 
 // ------ gradient-animatie binnen de bal ------
 let gradBuckets = [];
 let gradType = 'linear'; // 'linear' | 'radial' | 'angular'
-let gradSpeed = 1.0;
-let gradColors = ['#000000', '#190076', '#e9ffc4', '#ad0037', '#4000a3'];
-let gradAngleDeg = 0;      // richting van de lineaire gradient
-let gradStagger = 0.0;     // 0 = alle hexagons volledig gesynchroniseerd
+let gradSpeed = 3;
+let gradColors = ['#000000', '#ff1c00', '#ffee74', '#ff4a4a', '#660000'];
+let gradAngleDeg = 14;     // richting van de lineaire gradient
+let gradStagger = 0.35;    // 0 = alle hexagons volledig gesynchroniseerd
 let gradDirection = -1;    // 1 = voorwaarts, -1 = achterwaarts
 let gradBlur = 11;         // zachte blur op de gradient binnen elk hexagon (px)
-let gradNoise = 0.25;      // korrel/noise over de gradient (0-1)
+let gradNoise = 0.4;      // korrel/noise over de gradient (0-1)
 let ballEdgeBlur = 0;      // zachte blur over de hele bal, laat hexagon-randen in elkaar overlopen
 let noiseCanvas, noiseCtx, lastNoiseUpdate = 0;
 let bgAnimVisible = false; // achtergrondanimatie tonen/verbergen
@@ -652,7 +647,7 @@ const COMETS_PER_ROW = 1;        // één ononderbroken baan per actieve rij
 const COMET_CYCLE_BASE = 2400;   // basis ms om eenmaal het scherm te doorkruisen
 const COMET_WINDOW_BASE = 2.4;   // basis breedte van de zichtbare baan, in kolommen
 
-let laneSpeed = 1.0;             // via slider: snelheid-multiplier
+let laneSpeed = 1;             // via slider: snelheid-multiplier
 let laneLength = COMET_WINDOW_BASE; // via slider: lengte van de banen (in kolommen)
 let lengthStaggerAmount = 0.3;   // via slider: spreiding in lengte tussen rijen
 
@@ -665,6 +660,22 @@ let activeRows = new Set([0,1]);
 let nextRowSwitch = 0;
 let rowPhaseSeed = [];
 let rowLengthSeed = [];
+
+// ------ glitch-effect: displacement map obv fractal noise ------
+let glitchScene, glitchCamera, glitchMaterial;
+let sceneRenderTarget = null;
+let glitchNoiseCanvas, glitchNoiseCtx, glitchNoiseTexture;
+let lastGlitchCycleStart = 0;
+let nextGlitchInterval = 0;
+const GLITCH_DURATION = 220;   // ms dat een glitch-burst zichtbaar is
+let glitchWidth = 0.055;       // via slider: max. horizontale verschuiving (breedte van de glitch)
+let glitchHeight = 0.185;       // via slider: max. verticale verschuiving (hoogte van de glitch)
+let glitchFrequency = 2000;    // via slider: gemiddelde tijd (ms) tussen twee glitches
+let glitchIrregularity = 1;    // via slider: 0 = strak om de zoveel tijd, 1 = grillig/onvoorspelbaar
+let glitchCoarseness = 4;      // via slider: grofheid van de displacement (grootte van de noise-blokjes)
+let glitchAnimSpeed = 0.85;       // via slider: snelheid waarmee de glitch-animatie zelf afspeelt
+
+const fmtBlur = v => v.toFixed(1).replace(/\.0$/,'');
 
 init();
 animate();
@@ -686,6 +697,8 @@ function init(){
   renderer.domElement.style.filter = ballEdgeBlur > 0 ? `blur(${ballEdgeBlur}px)` : 'none';
   document.body.appendChild(renderer.domElement);
 
+  initGlitchFX();
+
   scene.add(new THREE.AmbientLight(0xffffff, 0.9));
   const dl = new THREE.DirectionalLight(0xffffff, 0.3);
   dl.position.set(4,6,5);
@@ -706,6 +719,11 @@ function init(){
 
   // onzichtbare sphere + de cirkels die eromheen verdeeld worden
   auraGroup = new THREE.Group();       // statische kanteling (X/Y/Z-sliders)
+  auraGroup.rotation.set(
+    THREE.MathUtils.degToRad(auraRotX),
+    THREE.MathUtils.degToRad(auraRotY),
+    THREE.MathUtils.degToRad(auraRotZ)
+  );
   // bewust NIET aan 'group' (de bal) toegevoegd maar rechtstreeks aan de scene, zodat de
   // sphere/cirkels volledig onafhankelijk van de rotatie van de bal (slepen + auto-draaien) blijven.
   scene.add(auraGroup);
@@ -724,7 +742,13 @@ function init(){
   loadIconImage(iconColor, img=>{ iconImage = img; });
   buildIconRandomOrder();
 
-  group.rotation.set(0.35, -0.6, 0.1);
+  group.rotation.set(
+    THREE.MathUtils.degToRad(ballRotX),
+    THREE.MathUtils.degToRad(ballRotY),
+    THREE.MathUtils.degToRad(ballRotZ)
+  );
+  group.scale.setScalar(ballScale);
+  if (auraGroup) auraGroup.scale.setScalar(ballScale);
 
   initGradient();
   rebuildGeometry(subdivN);
@@ -860,6 +884,189 @@ function onResize(){
   camera.aspect = window.innerWidth/window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  resizeGlitchRenderTarget();
+}
+
+/* ---------------- glitch-effect: displacement map obv fractal noise (à la After Effects) ---------------- */
+
+// kleine, deterministisch te seeden pseudo-random generator (voor reproduceerbare noise per burst)
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// bilineair geïnterpoleerde 'value noise', gestapeld in meerdere octaven (= fractal/fBm noise,
+// exact het type ruis dat After Effects' "Fractal Noise" gebruikt als bron voor een displacement map)
+function makeFractalNoiseSampler(seed){
+  const gridSize = 9;
+  const rnd = mulberry32(seed);
+  const grid = new Float32Array(gridSize*gridSize);
+  for(let i=0;i<grid.length;i++) grid[i] = rnd();
+
+  function sampleGrid(x,y){
+    x = ((x % gridSize) + gridSize) % gridSize;
+    y = ((y % gridSize) + gridSize) % gridSize;
+    return grid[y*gridSize + x];
+  }
+  function smooth(x,y){
+    const x0=Math.floor(x), y0=Math.floor(y);
+    const sx=x-x0, sy=y-y0;
+    const n00=sampleGrid(x0,y0), n10=sampleGrid(x0+1,y0);
+    const n01=sampleGrid(x0,y0+1), n11=sampleGrid(x0+1,y0+1);
+    const ix0 = n00+(n10-n00)*sx, ix1 = n01+(n11-n01)*sx;
+    return ix0+(ix1-ix0)*sy;
+  }
+  return function fbm(x,y){
+    let total=0, amp=1, freq=1, maxAmp=0;
+    for(let o=0;o<4;o++){
+      total += smooth(x*freq, y*freq) * amp;
+      maxAmp += amp;
+      amp *= 0.5;
+      freq *= 2.15;
+    }
+    return total/maxAmp;
+  };
+}
+
+// tekent een blokkerige, hard afgesneden ("geposterizede") fractal-noise textuur, met brede
+// horizontale banden - vergelijkbaar met de bijgeleverde referentie-displacement map
+function drawFractalNoise(seed){
+  const w = glitchNoiseCanvas.width, h = glitchNoiseCanvas.height;
+  const fbm = makeFractalNoiseSampler(seed);
+  const img = glitchNoiseCtx.createImageData(w,h);
+  const blockW = Math.max(1, Math.round(glitchCoarseness));
+  const blockH = Math.max(1, Math.round(glitchCoarseness*2)); // langgerekte blokjes geven de kenmerkende horizontale streep-look
+  const levels = 6; // posterize: hard afgesneden banden i.p.v. een vloeiend verloop
+  for(let by=0; by<h; by+=blockH){
+    const v = fbm(0.15, by*0.12); // per band-rij een eigen ruiswaarde
+    for(let bx=0; bx<w; bx+=blockW){
+      let n = fbm(bx*0.10, by*0.12 + bx*0.002);
+      n = Math.round(n*(levels-1))/(levels-1); // posterize
+      const gray = Math.max(0, Math.min(255, Math.floor(n*255)));
+      for(let y=by;y<Math.min(by+blockH,h);y++){
+        for(let x=bx;x<Math.min(bx+blockW,w);x++){
+          const idx = (y*w+x)*4;
+          img.data[idx]=gray; img.data[idx+1]=gray; img.data[idx+2]=gray; img.data[idx+3]=255;
+        }
+      }
+    }
+  }
+  glitchNoiseCtx.putImageData(img,0,0);
+  glitchNoiseTexture.needsUpdate = true;
+}
+
+function resizeGlitchRenderTarget(){
+  if (!sceneRenderTarget) return;
+  const pr = renderer.getPixelRatio();
+  sceneRenderTarget.setSize(Math.max(2, window.innerWidth*pr), Math.max(2, window.innerHeight*pr));
+}
+
+function initGlitchFX(){
+  const pr = renderer.getPixelRatio();
+  sceneRenderTarget = new THREE.WebGLRenderTarget(window.innerWidth*pr, window.innerHeight*pr, {
+    minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat
+  });
+
+  glitchNoiseCanvas = document.createElement('canvas');
+  glitchNoiseCanvas.width = 180; glitchNoiseCanvas.height = 180;
+  glitchNoiseCtx = glitchNoiseCanvas.getContext('2d');
+  glitchNoiseTexture = new THREE.CanvasTexture(glitchNoiseCanvas);
+  glitchNoiseTexture.wrapS = THREE.RepeatWrapping;
+  glitchNoiseTexture.wrapT = THREE.RepeatWrapping;
+  drawFractalNoise(1);
+
+  glitchScene = new THREE.Scene();
+  glitchCamera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+
+  glitchMaterial = new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: {
+      tDiffuse:  { value: sceneRenderTarget.texture },
+      tNoise:    { value: glitchNoiseTexture },
+      uAmount:   { value: 0 },
+      uSeed:     { value: 0 },
+      uMaxDispX: { value: glitchWidth },
+      uMaxDispY: { value: glitchHeight }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main(){
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D tDiffuse;
+      uniform sampler2D tNoise;
+      uniform float uAmount;
+      uniform float uSeed;
+      uniform float uMaxDispX; // breedte van de glitch: max. horizontale verschuiving
+      uniform float uMaxDispY; // hoogte van de glitch: max. verticale verschuiving
+      varying vec2 vUv;
+      void main(){
+        // de fractal-noise textuur werkt als displacement map: de grijswaarde bepaalt hoe
+        // ver elke pixel wordt verschoven - hetzelfde principe als een AE "Displacement Map"
+        // effect met Fractal Noise als bron, met losse Max Horizontal/Vertical Displacement.
+        vec2 noiseUv = vec2(vUv.x*1.4 + uSeed, vUv.y*1.0 + uSeed*0.6);
+        float n = texture2D(tNoise, noiseUv).r;
+        vec2 noiseUv2 = vec2(vUv.x*1.0 + uSeed*0.6 + 0.37, vUv.y*1.6 + uSeed + 0.61);
+        float n2 = texture2D(tNoise, noiseUv2).r;
+
+        float dispX = (n - 0.5) * uAmount * uMaxDispX;
+        float dispY = (n2 - 0.5) * uAmount * uMaxDispY;
+        vec2 uv = clamp(vUv + vec2(dispX, dispY), 0.0, 1.0);
+
+        // subtiele RGB-shift voor het klassieke glitch-gevoel
+        float shift = uAmount * 0.012 * (n - 0.5);
+        vec2 uvR = clamp(uv + vec2(shift,0.0), 0.0, 1.0);
+        vec2 uvB = clamp(uv - vec2(shift,0.0), 0.0, 1.0);
+
+        float r = texture2D(tDiffuse, uvR).r;
+        float g = texture2D(tDiffuse, uv).g;
+        float b = texture2D(tDiffuse, uvB).b;
+        float a = texture2D(tDiffuse, uv).a;
+
+        gl_FragColor = vec4(r,g,b,a);
+      }
+    `
+  });
+
+  const glitchMesh = new THREE.Mesh(new THREE.PlaneGeometry(2,2), glitchMaterial);
+  glitchScene.add(glitchMesh);
+}
+
+// bepaalt hoe sterk de glitch op dit moment is: 1x per 5 seconden een korte, flikkerende burst
+function updateGlitchState(now){
+  if (!lastGlitchCycleStart) lastGlitchCycleStart = now;
+  if (!nextGlitchInterval) nextGlitchInterval = glitchFrequency;
+  if (now - lastGlitchCycleStart >= nextGlitchInterval){
+    lastGlitchCycleStart = now;
+    // 'onregelmatigheid' laat de tijd tot de volgende burst random afwijken van de ingestelde
+    // frequentie, zodat het geen strak, voorspelbaar metronoom-ritme wordt.
+    const jitter = 1 + (Math.random()*2 - 1) * glitchIrregularity * 0.7;
+    nextGlitchInterval = Math.max(200, glitchFrequency * jitter);
+    drawFractalNoise(Math.floor(Math.random()*1e6)); // nieuwe ruis, zodat elke burst er anders uitziet
+  }
+  const t = (now - lastGlitchCycleStart) * glitchAnimSpeed; // 'snelheid' schaalt hoe snel de burst zelf afspeelt
+  let amount = 0;
+  if (t < GLITCH_DURATION){
+    const phase = Math.sin((t/GLITCH_DURATION) * Math.PI); // vloeiend op en weer af binnen de burst
+    // 'onregelmatigheid' maakt de flikkering binnenin de burst grilliger: hogere frequentie
+    // en diepere uitschieters i.p.v. één gladde golf.
+    const flickerFreq = 0.08 + glitchIrregularity * 0.4;
+    const flickerDepth = 0.35 + glitchIrregularity * 0.55;
+    const flicker = (1 - flickerDepth) + flickerDepth * Math.abs(Math.sin(t * flickerFreq * Math.PI));
+    amount = phase * flicker;
+    glitchMaterial.uniforms.uSeed.value = Math.floor(t/35) * 0.173; // stapsgewijze seed = 'springerige' blokjes
+  }
+  glitchMaterial.uniforms.uAmount.value = amount;
+  glitchMaterial.uniforms.uMaxDispX.value = glitchWidth;
+  glitchMaterial.uniforms.uMaxDispY.value = glitchHeight;
+  return amount;
 }
 
 /* ---------------- onzichtbare sphere + omsluitende cirkellijnen ---------------- */
@@ -1404,6 +1611,107 @@ function setViewMode(mode){
 }
 
 /* ---------------------- UI-paneel ---------------------- */
+// -------- generieke helpers om de UI te laten volgen op de huidige state (o.a. voor Opslaan) --------
+function setSliderVal(sliderId, labelId, value, fmt){
+  const s = document.getElementById(sliderId);
+  if (s) s.value = value;
+  if (labelId){
+    const l = document.getElementById(labelId);
+    if (l) l.textContent = fmt ? fmt(value) : value;
+  }
+}
+function setToggleState(toggleId, isRight){
+  const t = document.getElementById(toggleId);
+  if (!t) return;
+  t.classList.toggle('right', isRight);
+  t.classList.toggle('left', !isRight);
+}
+function setSwatchColor(id, hex){
+  const el = document.getElementById(id);
+  if (el) el.style.background = hex;
+}
+
+// -------- "Instellingen opslaan": patcht de standaardwaarden in de scriptbron met de huidige
+// live instellingen, en biedt de aangepaste pagina aan als download. --------
+function formatJSValue(v){
+  if (typeof v === 'string') return "'" + v.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + "'";
+  if (typeof v === 'boolean') return v ? 'true' : 'false';
+  if (Array.isArray(v)) return '[' + v.map(x => formatJSValue(x)).join(', ') + ']';
+  if (typeof v === 'number') return Number.isInteger(v) ? String(v) : String(Math.round(v*100000)/100000);
+  return String(v);
+}
+
+function patchDeclaration(code, name, value){
+  const re = new RegExp('(\\b' + name + '\\s*=\\s*)(-?\\d+(?:\\.\\d+)?|\'(?:[^\'\\\\]|\\\\.)*\'|true|false|\\[[^\\]]*\\])');
+  return code.replace(re, (m, pre) => pre + formatJSValue(value));
+}
+
+function buildSettingsList(){
+  return [
+    ['ballScale', ballScale], ['subdivN', subdivN], ['viewMode', viewMode],
+    ['gapValue', gapValue], ['tubeRadiusVal', tubeRadiusVal],
+    ['rotationSpeed', rotationSpeed], ['rotationDirection', rotationDirection],
+    ['ballRotX', THREE.MathUtils.radToDeg(group.rotation.x)],
+    ['ballRotY', THREE.MathUtils.radToDeg(group.rotation.y)],
+    ['ballRotZ', THREE.MathUtils.radToDeg(group.rotation.z)],
+    ['ballEdgeBlur', ballEdgeBlur], ['ballVisible', ballVisible], ['sphereVisible', sphereVisible],
+
+    ['gradType', gradType], ['gradSpeed', gradSpeed], ['gradColors', gradColors],
+    ['gradAngleDeg', gradAngleDeg], ['gradStagger', gradStagger], ['gradDirection', gradDirection],
+    ['gradBlur', gradBlur], ['gradNoise', gradNoise],
+
+    ['auraSphereRadius', auraSphereRadius], ['auraRotX', auraRotX], ['auraRotY', auraRotY], ['auraRotZ', auraRotZ],
+    ['auraSpinSpeed', auraSpinSpeed], ['auraCircleCount', auraCircleCount], ['auraTubeRadius', auraTubeRadius],
+    ['auraGradColors', auraGradColors], ['auraGradStagger', auraGradStagger],
+    ['auraVisibleCount', auraVisibleCount], ['auraThicknessStagger', auraThicknessStagger],
+    ['auraSequenceSpeed', auraSequenceSpeed], ['auraSequenceDirection', auraSequenceDirection],
+
+    ['iconColor', iconColor], ['iconGridCols', iconGridCols], ['iconGridRows', iconGridRows],
+    ['iconVisibleCount', iconVisibleCount], ['iconSequenceSpeed', iconSequenceSpeed],
+    ['iconGridVisible', iconGridVisible], ['iconRandomness', iconRandomness],
+
+    ['glitchWidth', glitchWidth], ['glitchHeight', glitchHeight], ['glitchFrequency', glitchFrequency],
+    ['glitchIrregularity', glitchIrregularity], ['glitchCoarseness', glitchCoarseness], ['glitchAnimSpeed', glitchAnimSpeed],
+
+    ['bgColor', bgColor], ['bgPageColor', bgPageColor], ['bgAnimVisible', bgAnimVisible],
+    ['gridRowCount', gridRowCount], ['laneCount', laneCount], ['staggerAmount', staggerAmount],
+    ['laneSpeed', laneSpeed], ['lengthStaggerAmount', lengthStaggerAmount]
+  ];
+}
+
+function handleSaveSettings(){
+  try {
+    const scriptEl = Array.from(document.scripts).find(s => !s.src);
+    if (!scriptEl){ alert('Kon de scriptbron niet vinden.'); return; }
+    const originalScriptText = scriptEl.textContent;
+
+    let code = originalScriptText;
+    buildSettingsList().forEach(([name, value])=>{
+      code = patchDeclaration(code, name, value);
+    });
+
+    const fullHtml = document.documentElement.outerHTML;
+    if (!fullHtml.includes(originalScriptText)){
+      alert('Opslaan mislukt: kon de scriptinhoud niet terugvinden in de pagina.');
+      return;
+    }
+    const newHtml = '<!DOCTYPE html>\n' + fullHtml.replace(originalScriptText, code);
+
+    const blob = new Blob([newHtml], { type:'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'voetbal_3d_lijntekening_opgeslagen.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(err){
+    console.error(err);
+    alert('Er ging iets mis bij het opslaan: ' + err.message);
+  }
+}
+
 function setupPanel(){
   const sizeSlider = document.getElementById('sizeSlider');
   const hexSlider = document.getElementById('hexSlider');
@@ -1429,53 +1737,6 @@ function setupPanel(){
   hexSlider.addEventListener('change', (e)=>{
     subdivN = parseInt(e.target.value);
     rebuildGeometry(subdivN);
-  });
-
-  const rowsSlider = document.getElementById('rowsSlider');
-  const rowsVal = document.getElementById('rowsVal');
-  rowsSlider.addEventListener('input', (e)=>{
-    gridRowCount = parseInt(e.target.value);
-    rowsVal.textContent = gridRowCount;
-    if (bgCtx) resizeBackground();
-  });
-
-  const lanesSlider = document.getElementById('lanesSlider');
-  const lanesVal = document.getElementById('lanesVal');
-  lanesSlider.addEventListener('input', (e)=>{
-    laneCount = parseInt(e.target.value);
-    lanesVal.textContent = laneCount;
-    if (bgCtx){
-      activeRows = pickActiveRows(laneCount, gridRowCount);
-      nextRowSwitch = performance.now() + ROW_SWITCH_INTERVAL;
-    }
-  });
-
-  const staggerSlider = document.getElementById('staggerSlider');
-  const staggerVal = document.getElementById('staggerVal');
-  staggerSlider.addEventListener('input', (e)=>{
-    staggerAmount = parseFloat(e.target.value);
-    staggerVal.textContent = staggerAmount.toFixed(2);
-  });
-
-  const laneSpeedSlider = document.getElementById('laneSpeedSlider');
-  const laneSpeedVal = document.getElementById('laneSpeedVal');
-  laneSpeedSlider.addEventListener('input', (e)=>{
-    laneSpeed = parseFloat(e.target.value);
-    laneSpeedVal.textContent = laneSpeed.toFixed(2);
-  });
-
-  const laneLengthSlider = document.getElementById('laneLengthSlider');
-  const laneLengthVal = document.getElementById('laneLengthVal');
-  laneLengthSlider.addEventListener('input', (e)=>{
-    laneLength = parseFloat(e.target.value);
-    laneLengthVal.textContent = laneLength.toFixed(1);
-  });
-
-  const lengthStaggerSlider = document.getElementById('lengthStaggerSlider');
-  const lengthStaggerVal = document.getElementById('lengthStaggerVal');
-  lengthStaggerSlider.addEventListener('input', (e)=>{
-    lengthStaggerAmount = parseFloat(e.target.value);
-    lengthStaggerVal.textContent = lengthStaggerAmount.toFixed(2);
   });
 
   const gradSpeedSlider = document.getElementById('gradSpeedSlider');
@@ -1511,7 +1772,7 @@ function setupPanel(){
   document.getElementById('btnGradLinear').addEventListener('click', ()=> setGradType('linear'));
   document.getElementById('btnGradRadial').addEventListener('click', ()=> setGradType('radial'));
   document.getElementById('btnGradAngular').addEventListener('click', ()=> setGradType('angular'));
-  setGradType('linear');
+  setGradType(gradType);
 
   const gradDirToggle = document.getElementById('gradDirToggle');
   gradDirToggle.addEventListener('click', ()=>{
@@ -1541,14 +1802,6 @@ function setupPanel(){
   gradNoiseSlider.addEventListener('input', (e)=>{
     gradNoise = parseFloat(e.target.value);
     gradNoiseVal.textContent = gradNoise.toFixed(2);
-  });
-
-  const bgVisToggle = document.getElementById('bgVisToggle');
-  bgVisToggle.addEventListener('click', ()=>{
-    const goingRight = !bgVisToggle.classList.contains('right');
-    bgVisToggle.classList.toggle('right', goingRight);
-    bgVisToggle.classList.toggle('left', !goingRight);
-    bgAnimVisible = !goingRight;
   });
 
   const auraVisibleCountSlider = document.getElementById('auraVisibleCountSlider');
@@ -1694,6 +1947,7 @@ function setupPanel(){
 
   document.getElementById('btnImages').addEventListener('click', ()=> setViewMode('images'));
   document.getElementById('btnOutline').addEventListener('click', ()=> setViewMode('outline'));
+  setViewMode(viewMode);
 
   const dirToggle = document.getElementById('dirToggle');
   dirToggle.addEventListener('click', ()=>{
@@ -1709,25 +1963,25 @@ function setupPanel(){
   const ballRotXSlider = document.getElementById('ballRotXSlider');
   const ballRotXVal = document.getElementById('ballRotXVal');
   ballRotXSlider.addEventListener('input', (e)=>{
-    const deg = parseFloat(e.target.value);
-    group.rotation.x = THREE.MathUtils.degToRad(deg);
-    ballRotXVal.textContent = Math.round(deg) + '°';
+    ballRotX = parseFloat(e.target.value);
+    group.rotation.x = THREE.MathUtils.degToRad(ballRotX);
+    ballRotXVal.textContent = Math.round(ballRotX) + '°';
   });
 
   const ballRotYSlider = document.getElementById('ballRotYSlider');
   const ballRotYVal = document.getElementById('ballRotYVal');
   ballRotYSlider.addEventListener('input', (e)=>{
-    const deg = parseFloat(e.target.value);
-    group.rotation.y = THREE.MathUtils.degToRad(deg);
-    ballRotYVal.textContent = Math.round(deg) + '°';
+    ballRotY = parseFloat(e.target.value);
+    group.rotation.y = THREE.MathUtils.degToRad(ballRotY);
+    ballRotYVal.textContent = Math.round(ballRotY) + '°';
   });
 
   const ballRotZSlider = document.getElementById('ballRotZSlider');
   const ballRotZVal = document.getElementById('ballRotZVal');
   ballRotZSlider.addEventListener('input', (e)=>{
-    const deg = parseFloat(e.target.value);
-    group.rotation.z = THREE.MathUtils.degToRad(deg);
-    ballRotZVal.textContent = Math.round(deg) + '°';
+    ballRotZ = parseFloat(e.target.value);
+    group.rotation.z = THREE.MathUtils.degToRad(ballRotZ);
+    ballRotZVal.textContent = Math.round(ballRotZ) + '°';
   });
 
   const iconColsSlider = document.getElementById('iconColsSlider');
@@ -1785,7 +2039,8 @@ function setupPanel(){
     const goingRight = !ballVisToggle.classList.contains('right');
     ballVisToggle.classList.toggle('right', goingRight);
     ballVisToggle.classList.toggle('left', !goingRight);
-    group.visible = !goingRight;
+    ballVisible = !goingRight;
+    group.visible = ballVisible;
   });
 
   const sphereVisToggle = document.getElementById('sphereVisToggle');
@@ -1793,7 +2048,8 @@ function setupPanel(){
     const goingRight = !sphereVisToggle.classList.contains('right');
     sphereVisToggle.classList.toggle('right', goingRight);
     sphereVisToggle.classList.toggle('left', !goingRight);
-    if (auraGroup) auraGroup.visible = !goingRight;
+    sphereVisible = !goingRight;
+    if (auraGroup) auraGroup.visible = sphereVisible;
   });
 
   const iconGridVisToggle = document.getElementById('iconGridVisToggle');
@@ -1803,6 +2059,110 @@ function setupPanel(){
     iconGridVisToggle.classList.toggle('left', !goingRight);
     iconGridVisible = !goingRight;
   });
+
+  const glitchWidthSlider = document.getElementById('glitchWidthSlider');
+  const glitchWidthVal = document.getElementById('glitchWidthVal');
+  glitchWidthSlider.addEventListener('input', (e)=>{
+    glitchWidth = parseFloat(e.target.value);
+    glitchWidthVal.textContent = glitchWidth.toFixed(3);
+  });
+
+  const glitchHeightSlider = document.getElementById('glitchHeightSlider');
+  const glitchHeightVal = document.getElementById('glitchHeightVal');
+  glitchHeightSlider.addEventListener('input', (e)=>{
+    glitchHeight = parseFloat(e.target.value);
+    glitchHeightVal.textContent = glitchHeight.toFixed(3);
+  });
+
+  const glitchFreqSlider = document.getElementById('glitchFreqSlider');
+  const glitchFreqVal = document.getElementById('glitchFreqVal');
+  glitchFreqSlider.addEventListener('input', (e)=>{
+    glitchFrequency = parseFloat(e.target.value) * 1000; // seconden -> ms
+    glitchFreqVal.textContent = parseFloat(e.target.value).toFixed(1);
+  });
+
+  const glitchIrregularitySlider = document.getElementById('glitchIrregularitySlider');
+  const glitchIrregularityVal = document.getElementById('glitchIrregularityVal');
+  glitchIrregularitySlider.addEventListener('input', (e)=>{
+    glitchIrregularity = parseFloat(e.target.value);
+    glitchIrregularityVal.textContent = glitchIrregularity.toFixed(2);
+  });
+
+  const glitchCoarsenessSlider = document.getElementById('glitchCoarsenessSlider');
+  const glitchCoarsenessVal = document.getElementById('glitchCoarsenessVal');
+  glitchCoarsenessSlider.addEventListener('input', (e)=>{
+    glitchCoarseness = parseFloat(e.target.value);
+    glitchCoarsenessVal.textContent = Math.round(glitchCoarseness);
+    if (glitchNoiseCanvas) drawFractalNoise(Math.floor(Math.random()*1e6));
+  });
+
+  const glitchAnimSpeedSlider = document.getElementById('glitchAnimSpeedSlider');
+  const glitchAnimSpeedVal = document.getElementById('glitchAnimSpeedVal');
+  glitchAnimSpeedSlider.addEventListener('input', (e)=>{
+    glitchAnimSpeed = parseFloat(e.target.value);
+    glitchAnimSpeedVal.textContent = glitchAnimSpeed.toFixed(2);
+  });
+
+  // -------- alle UI laten volgen op de huidige state (belangrijk na het laden van een opgeslagen bestand) --------
+  setSliderVal('sizeSlider','sizeVal', ballScale, v=>Math.round(v*100)+'%');
+  setSliderVal('hexSlider','hexVal', subdivN, v=>hexCountForN(v));
+  setSliderVal('gapSlider','gapVal', gapValue, v=>v.toFixed(2));
+  setSliderVal('thickSlider','thickVal', tubeRadiusVal, v=>v.toFixed(3));
+  setSliderVal('speedSlider','speedVal', rotationSpeed, v=>v.toFixed(4));
+  setToggleState('dirToggle', rotationDirection === -1);
+  setSliderVal('edgeBlurSlider','edgeBlurVal', ballEdgeBlur, fmtBlur);
+  renderer.domElement.style.filter = ballEdgeBlur > 0 ? `blur(${ballEdgeBlur}px)` : 'none';
+
+  setSliderVal('ballRotXSlider','ballRotXVal', ballRotX, v=>Math.round(v)+'°');
+  setSliderVal('ballRotYSlider','ballRotYVal', ballRotY, v=>Math.round(v)+'°');
+  setSliderVal('ballRotZSlider','ballRotZVal', ballRotZ, v=>Math.round(v)+'°');
+
+  setSliderVal('gradAngleSlider','gradAngleVal', gradAngleDeg, v=>Math.round(v)+'°');
+  setSliderVal('gradSpeedSlider','gradSpeedVal', gradSpeed, v=>v.toFixed(2));
+  setSliderVal('gradStaggerSlider','gradStaggerVal', gradStagger, v=>v.toFixed(2));
+  setToggleState('gradDirToggle', gradDirection === -1);
+  setSliderVal('gradBlurSlider','gradBlurVal', gradBlur, fmtBlur);
+  setSliderVal('gradNoiseSlider','gradNoiseVal', gradNoise, v=>v.toFixed(2));
+  ['swatchGradA','swatchGradB','swatchGradC','swatchGradD','swatchGradE'].forEach((id,i)=> setSwatchColor(id, gradColors[i]));
+
+  setSliderVal('auraSizeSlider','auraSizeVal', auraSphereRadius, v=>v.toFixed(2));
+  setSliderVal('auraRotXSlider','auraRotXVal', auraRotX, v=>Math.round(v)+'°');
+  setSliderVal('auraRotYSlider','auraRotYVal', auraRotY, v=>Math.round(v)+'°');
+  setSliderVal('auraRotZSlider','auraRotZVal', auraRotZ, v=>Math.round(v)+'°');
+  setSliderVal('auraSpinSpeedSlider','auraSpinSpeedVal', auraSpinSpeed, v=>v.toFixed(4));
+
+  setSliderVal('auraThickSlider','auraThickVal', auraTubeRadius, v=>v.toFixed(4));
+  setSliderVal('auraThickStaggerSlider','auraThickStaggerVal', auraThicknessStagger, v=>v.toFixed(2));
+  ['swatchAuraGradA','swatchAuraGradB','swatchAuraGradC','swatchAuraGradD'].forEach((id,i)=> setSwatchColor(id, auraGradColors[i]));
+  setSliderVal('auraGradStaggerSlider','auraGradStaggerVal', auraGradStagger, v=>v.toFixed(2));
+
+  setSliderVal('auraCountSlider','auraCountVal', auraCircleCount, v=>v);
+  syncAuraVisibleBounds();
+  setSliderVal('auraSpeedSlider','auraSpeedVal', auraSequenceSpeed, v=>v.toFixed(2));
+  setToggleState('auraDirToggle', auraSequenceDirection === -1);
+
+  setSliderVal('iconColsSlider','iconColsVal', iconGridCols, v=>v);
+  setSliderVal('iconRowsSlider','iconRowsVal', iconGridRows, v=>v);
+  syncIconVisibleBounds();
+  setSliderVal('iconSpeedSlider','iconSpeedVal', iconSequenceSpeed, v=>v.toFixed(2));
+  setSliderVal('iconRandomnessSlider','iconRandomnessVal', iconRandomness, v=>v.toFixed(2));
+  setSwatchColor('swatchIconColor', iconColor);
+
+  setSliderVal('glitchWidthSlider','glitchWidthVal', glitchWidth, v=>v.toFixed(3));
+  setSliderVal('glitchHeightSlider','glitchHeightVal', glitchHeight, v=>v.toFixed(3));
+  setSliderVal('glitchFreqSlider','glitchFreqVal', glitchFrequency/1000, v=>v.toFixed(1));
+  setSliderVal('glitchIrregularitySlider','glitchIrregularityVal', glitchIrregularity, v=>v.toFixed(2));
+  setSliderVal('glitchCoarsenessSlider','glitchCoarsenessVal', glitchCoarseness, v=>Math.round(v));
+  setSliderVal('glitchAnimSpeedSlider','glitchAnimSpeedVal', glitchAnimSpeed, v=>v.toFixed(2));
+
+  setToggleState('ballVisToggle', !ballVisible);
+  setToggleState('sphereVisToggle', !sphereVisible);
+  setToggleState('iconGridVisToggle', !iconGridVisible);
+  group.visible = ballVisible;
+  if (auraGroup) auraGroup.visible = sphereVisible;
+
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', handleSaveSettings);
 }
 
 /* -------------------- custom color picker (matcht de rest van de UI) -------------------- */
@@ -1845,8 +2205,6 @@ function setupColorPicker(){
     gradC: { get:()=>gradColors[2], set:v=>{gradColors[2]=v;}, label:'Kleur C', swatch:'swatchGradC' },
     gradD: { get:()=>gradColors[3], set:v=>{gradColors[3]=v;}, label:'Kleur D', swatch:'swatchGradD' },
     gradE: { get:()=>gradColors[4], set:v=>{gradColors[4]=v;}, label:'Kleur E', swatch:'swatchGradE' },
-    bg:    { get:()=>bgColor,       set:v=>{bgColor=v;},       label:'Vormenkleur', swatch:'swatchBg' },
-    bgPage:{ get:()=>bgPageColor,   set:v=>{bgPageColor=v;},   label:'Achtergrondkleur', swatch:'swatchBgPage' },
     auraGradA: { get:()=>auraGradColors[0], set:v=>{auraGradColors[0]=v;}, label:'Cirkel kleur A', swatch:'swatchAuraGradA' },
     auraGradB: { get:()=>auraGradColors[1], set:v=>{auraGradColors[1]=v;}, label:'Cirkel kleur B', swatch:'swatchAuraGradB' },
     auraGradC: { get:()=>auraGradColors[2], set:v=>{auraGradColors[2]=v;}, label:'Cirkel kleur C', swatch:'swatchAuraGradC' },
@@ -2264,8 +2622,18 @@ function animate(now){
   }
   drawAllGradients(now || 0);
   updateAuraAnimation(now || performance.now());
-  renderer.render(scene, camera);
+
+  const glitchAmount = sceneRenderTarget ? updateGlitchState(now || performance.now()) : 0;
+  if (glitchAmount > 0.001){
+    renderer.setRenderTarget(sceneRenderTarget);
+    renderer.render(scene, camera);
+    renderer.setRenderTarget(null);
+    renderer.render(glitchScene, glitchCamera);
+  } else {
+    renderer.render(scene, camera);
+  }
 }
-</script>
-</body>
-</html>
+</script><canvas width="2880" height="1508" style="display: block; width: 1440px; height: 754px; position: fixed; inset: 0px; z-index: 1; filter: none;"></canvas><canvas width="2880" height="1508" style="display: block; width: 1440px; height: 754px; position: fixed; inset: 0px; z-index: 1; filter: none;"></canvas>
+
+
+</body></html>
