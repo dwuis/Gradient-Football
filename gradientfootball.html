@@ -43,6 +43,10 @@
     position:fixed; bottom:16px; left:16px; z-index:3;
     display:flex; gap:10px; align-items:stretch;
   }
+  #addBallControls {
+    position:fixed; bottom:16px; right:16px; z-index:3;
+    display:flex; align-items:stretch;
+  }
   #saveSettingsBtn {
     background:#ffffff; color:#000000; border:none; padding:13px 16px;
     display:flex; align-items:center; justify-content:center; cursor:pointer;
@@ -58,7 +62,20 @@
   #toggleUiBtn:hover, #toggleDataBtn:hover { border-color:rgba(255,255,255,0.3); }
   #toggleUiBtn:active, #toggleDataBtn:active { transform:translateY(1px); }
   #toggleUiBtn.activeState, #toggleDataBtn.activeState { border-color:rgba(255,255,255,0.6); }
+  #addBallBtn {
+    background:rgba(0,0,0,0.95); color:#c6ff00; border:1px solid #c6ff00;
+    padding:13px 16px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; border-radius:0;
+  }
+  #addBallBtn:hover { background:rgba(198,255,0,0.12); }
+  #addBallBtn:active { transform:translateY(1px); }
 
+
+  #ballIndicator {
+    position:fixed; bottom:6vh; left:50%; transform:translateX(-50%); z-index:2;
+    font-family:'DM Mono', monospace; font-size:12px; letter-spacing:0.04em; color:#fff;
+    text-transform:uppercase; pointer-events:none;
+  }
 
   #statsHud {
     position:fixed; top:24vh; right:10vw; width:480px; height:440px;
@@ -230,6 +247,15 @@
   <div id="navArrowRightLottie" class="navArrowLottie"></div>
 </button>
 
+<div id="addBallControls">
+  <button id="addBallBtn" title="Nieuwe bal toevoegen">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="12" y1="5" x2="12" y2="19"></line>
+      <line x1="5" y1="12" x2="19" y2="12"></line>
+    </svg>
+  </button>
+</div>
+
 <div id="bottomControls">
   <button id="saveSettingsBtn" title="Instellingen opslaan">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -238,7 +264,7 @@
     <polyline points="7 3 7 8 15 8"></polyline>
   </svg>
 </button>
-  <button id="toggleUiBtn" title="Toon/verberg design- en animatiepanelen" class="activeState">
+  <button id="toggleUiBtn" title="Toon/verberg design- en animatiepanelen" class="">
     <svg id="toggleUiIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
     </svg>
@@ -252,7 +278,9 @@
   </button>
 </div>
 
-<div id="statsHud" class="" style="transform: translate(-37.6px, 37.1px);">
+<div id="ballIndicator">1 of 3</div>
+
+<div id="statsHud" class="" style="transform: translate(-37.9px, 35.5px);">
   <div id="statsHudLine" class="" style="top: 96px;"></div>
   <div id="statsList">
     <div id="statsHudTitle" class="">Phantom GX</div>
@@ -353,7 +381,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelBinnenkant" style="">
+  <div class="panel collapsed" id="panelBinnenkant" style="display: none;">
     <div class="panel-header" data-target="panelBinnenkant">
       <span>Binnenkant</span>
       <button class="collapseBtn">+</button>
@@ -374,7 +402,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelBall" style="">
+  <div class="panel collapsed" id="panelBall" style="display: none;">
     <div class="panel-header" data-target="panelBall">
       <span>Bal</span>
       <button class="collapseBtn">+</button>
@@ -423,7 +451,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelDissolve" style="">
+  <div class="panel collapsed" id="panelDissolve" style="display: none;">
     <div class="panel-header" data-target="panelDissolve">
       <span>Dissolve</span>
       <button class="collapseBtn">+</button>
@@ -464,7 +492,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelBallRotation" style="">
+  <div class="panel collapsed" id="panelBallRotation" style="display: none;">
     <div class="panel-header" data-target="panelBallRotation">
       <span>Bal rotatie</span>
       <button class="collapseBtn">+</button>
@@ -475,7 +503,7 @@
         <input type="range" id="ballRotXSlider" min="-180" max="180" step="1" value="20">
       </div>
       <div class="row">
-        <label>Rotatie bal Y <span class="val" id="ballRotYVal">36354°</span></label>
+        <label>Rotatie bal Y <span class="val" id="ballRotYVal">36799°</span></label>
         <input type="range" id="ballRotYSlider" min="-180" max="180" step="1" value="-34">
       </div>
       <div class="row">
@@ -485,7 +513,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelGradient" style="">
+  <div class="panel collapsed" id="panelGradient" style="display: none;">
     <div class="panel-header" data-target="panelGradient">
       <span>Gradient</span>
       <button class="collapseBtn">+</button>
@@ -559,7 +587,7 @@
 </div>
 
 <div id="panelsContainerRight" style="">
-  <div class="panel collapsed" id="panelSphere" style="">
+  <div class="panel collapsed" id="panelSphere" style="display: none;">
     <div class="panel-header" data-target="panelSphere">
       <span>Sphere</span>
       <button class="collapseBtn">+</button>
@@ -588,7 +616,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelLineStyle" style="">
+  <div class="panel collapsed" id="panelLineStyle" style="display: none;">
     <div class="panel-header" data-target="panelLineStyle">
       <span>Lijnstijl</span>
       <button class="collapseBtn">+</button>
@@ -630,7 +658,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelAura" style="">
+  <div class="panel collapsed" id="panelAura" style="display: none;">
     <div class="panel-header" data-target="panelAura">
       <span>Sequence</span>
       <button class="collapseBtn">+</button>
@@ -661,10 +689,10 @@
     </div>
   </div>
 
-  <div class="panel" id="panelIconGrid" style="">
+  <div class="panel collapsed" id="panelIconGrid" style="display: none;">
     <div class="panel-header" data-target="panelIconGrid">
       <span>Icon-grid</span>
-      <button class="collapseBtn">–</button>
+      <button class="collapseBtn">+</button>
     </div>
     <div class="panel-body">
       <div class="row">
@@ -694,7 +722,7 @@
     </div>
   </div>
 
-  <div class="panel collapsed" id="panelGlitch" style="">
+  <div class="panel collapsed" id="panelGlitch" style="display: none;">
     <div class="panel-header" data-target="panelGlitch">
       <span>Glitch</span>
       <button class="collapseBtn">+</button>
@@ -730,45 +758,7 @@
 </div>
 
 <div id="panelsContainerBottomRight" style="">
-  <div class="panel collapsed" id="panelVisibility" style="">
-    <div class="panel-header" data-target="panelVisibility">
-      <span>Zichtbaarheid</span>
-      <button class="collapseBtn">+</button>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <label>Bal</label>
-        <div id="ballVisToggle" class="toggle-track left">
-          <div class="toggle-thumb"></div>
-          <div class="toggle-labels">
-            <span>Zichtbaar</span>
-            <span>Verborgen</span>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <label>Sphere</label>
-        <div id="sphereVisToggle" class="toggle-track left">
-          <div class="toggle-thumb"></div>
-          <div class="toggle-labels">
-            <span>Zichtbaar</span>
-            <span>Verborgen</span>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <label>Icon-grid</label>
-        <div id="iconGridVisToggle" class="toggle-track left">
-          <div class="toggle-thumb"></div>
-          <div class="toggle-labels">
-            <span>Zichtbaar</span>
-            <span>Verborgen</span>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-</div>
 
 <div id="colorPopup" class="panel" style="position: fixed; display: none; width: 200px; z-index: 5; left: 1452px; top: 16px;">
   <div class="panel-header" id="colorPopupHeader">
@@ -790,7 +780,7 @@
 </div>
 
 <div id="loading" style="opacity: 0;">bezig met opbouwen…</div>
-<div id="hint">Sleep om te draaien · scroll om te zoomen</div>
+<div id="hint">Drag to rotate · scroll to zoom · hover and be amazed</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -823,7 +813,7 @@ let gapValue = 0.02;
 let tubeRadiusVal = 0.003;
 let rotationSpeed = 0.0065;
 let rotationDirection = 1;
-let ballRotX = 133.1021, ballRotY = 36604.72693, ballRotZ = 34; // graden: startkanteling van de bal
+let ballRotX = 133.1021, ballRotY = 37066.53091, ballRotZ = 34; // graden: startkanteling van de bal
 
 // ------ onzichtbare sphere met daaromheen verdeelde cirkels ------
 let auraGroup = null, auraSpinGroup = null, auraSphereMesh = null;
@@ -951,12 +941,50 @@ const BALL_VIDEO_CONFIG = [
 ];
 let shoeVideoTextures = [];
 let currentBallIndex = 1;
-let ballProfiles = [{"currentBallIndex":0,"ballScale":0.81,"subdivN":3,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":180,"ballRotY":30584.080725176653,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"linear","gradSpeed":3,"gradColors":["#000000","#ff0000","#fdd640","#ff3939","#5c0505"],"gradAngleDeg":14,"gradStagger":0.35,"gradDirection":1,"gradBlur":20,"gradNoise":0.4,"auraSphereRadius":2.2,"auraRotX":-57,"auraRotY":-63,"auraRotZ":73,"auraSpinSpeed":0,"auraCircleCount":64,"auraTubeRadius":0.0015,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":23,"auraThicknessStagger":1,"auraSequenceSpeed":40,"auraSequenceDirection":1,"iconColor":"#ffe927","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":0.5,"dissolveAreaSize":1.8,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#de8aff","dissolveOuterGlow":0,"dissolveLineThickness":0.015,"insideColor":"#ffe522","insideShadowStrength":0.3,"insideShadowSoftness":1.6,"statsHudTitle":"Air Zoom Mercury","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3},{"currentBallIndex":1,"ballScale":0.8,"subdivN":4,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":133.1021,"ballRotY":36604.726926137235,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"radial","gradSpeed":3,"gradColors":["#ff00f4","#001cc3","#ffe300","#bbff00","#ff0000"],"gradAngleDeg":14,"gradStagger":0,"gradDirection":-1,"gradBlur":20,"gradNoise":0.45,"auraSphereRadius":2.7,"auraRotX":-57,"auraRotY":-63,"auraRotZ":73,"auraSpinSpeed":0,"auraCircleCount":37,"auraTubeRadius":0.0045,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":1,"auraThicknessStagger":1,"auraSequenceSpeed":25.3,"auraSequenceDirection":1,"iconColor":"#c6ff00","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":0.5,"dissolveAreaSize":1.8,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#00ff15","dissolveOuterGlow":0,"dissolveLineThickness":0.015,"insideColor":"#00ffb0","insideShadowStrength":0.4,"insideShadowSoftness":1.5,"statsHudTitle":"Phantom GX","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3},{"currentBallIndex":2,"ballScale":0.8,"subdivN":5,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":180,"ballRotY":45089.19485823716,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"angular","gradSpeed":1.6,"gradColors":["#c4ff00","#005b2e","#9bff00","#405400","#8cff00"],"gradAngleDeg":14,"gradStagger":0.05,"gradDirection":1,"gradBlur":20,"gradNoise":0.35,"auraSphereRadius":2.4,"auraRotX":-26,"auraRotY":-161,"auraRotZ":50,"auraSpinSpeed":0.0035,"auraCircleCount":25,"auraTubeRadius":0.0015,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":9,"auraThicknessStagger":1,"auraSequenceSpeed":17.3,"auraSequenceDirection":-1,"iconColor":"#ff0043","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":0.5,"dissolveAreaSize":1.8,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#00dcff","dissolveOuterGlow":0,"dissolveLineThickness":0.06,"insideColor":"#ff002e","insideShadowStrength":0.85,"insideShadowSoftness":0.55,"statsHudTitle":"Phantom","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3}];
+let ballProfiles = [{"currentBallIndex":0,"ballScale":0.81,"subdivN":3,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":180,"ballRotY":31704.32780620954,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"linear","gradSpeed":3,"gradColors":["#000000","#ff0000","#fdd640","#ff3939","#5c0505"],"gradAngleDeg":14,"gradStagger":0.35,"gradDirection":1,"gradBlur":20,"gradNoise":0.4,"auraSphereRadius":2.2,"auraRotX":-57,"auraRotY":-63,"auraRotZ":73,"auraSpinSpeed":0,"auraCircleCount":64,"auraTubeRadius":0.0015,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":23,"auraThicknessStagger":1,"auraSequenceSpeed":40,"auraSequenceDirection":1,"iconColor":"#ffe927","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":1.1,"dissolveAreaSize":2.3,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#de8aff","dissolveOuterGlow":0,"dissolveLineThickness":0.015,"insideColor":"#ffe522","insideShadowStrength":0.3,"insideShadowSoftness":1.6,"statsHudTitle":"Air Zoom Mercury","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3},{"currentBallIndex":1,"ballScale":0.8,"subdivN":4,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":133.1021,"ballRotY":37066.53091287261,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"radial","gradSpeed":3,"gradColors":["#ff00f4","#001cc3","#ffe300","#bbff00","#ff0000"],"gradAngleDeg":14,"gradStagger":0,"gradDirection":-1,"gradBlur":20,"gradNoise":0.45,"auraSphereRadius":2.7,"auraRotX":-57,"auraRotY":-63,"auraRotZ":73,"auraSpinSpeed":0,"auraCircleCount":37,"auraTubeRadius":0.0045,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":1,"auraThicknessStagger":1,"auraSequenceSpeed":25.3,"auraSequenceDirection":1,"iconColor":"#c6ff00","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":0.5,"dissolveAreaSize":1.8,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#00ff15","dissolveOuterGlow":0,"dissolveLineThickness":0.015,"insideColor":"#00ffb0","insideShadowStrength":0.4,"insideShadowSoftness":1.5,"statsHudTitle":"Phantom GX","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3},{"currentBallIndex":2,"ballScale":0.8,"subdivN":5,"viewMode":"images","gapValue":0.02,"tubeRadiusVal":0.003,"rotationSpeed":0.0065,"rotationDirection":1,"ballRotX":180,"ballRotY":45618.77974827332,"ballRotZ":34,"ballEdgeBlur":0,"ballVisible":true,"sphereVisible":true,"gradType":"angular","gradSpeed":1.6,"gradColors":["#c4ff00","#005b2e","#9bff00","#405400","#8cff00"],"gradAngleDeg":14,"gradStagger":0.05,"gradDirection":1,"gradBlur":20,"gradNoise":0.35,"auraSphereRadius":2.4,"auraRotX":-26,"auraRotY":-161,"auraRotZ":50,"auraSpinSpeed":0.0035,"auraCircleCount":25,"auraTubeRadius":0.0015,"auraGradColors":["#00ff7b","#7800ff","#e5acff","#80fcc1"],"auraGradStagger":1,"auraVisibleCount":9,"auraThicknessStagger":1,"auraSequenceSpeed":17.3,"auraSequenceDirection":-1,"iconColor":"#ff0043","iconGridCols":15,"iconGridRows":15,"iconVisibleCount":26,"iconSequenceSpeed":80,"iconGridVisible":true,"iconRandomness":0.25,"glitchWidth":0.11,"glitchHeight":0.05,"glitchFrequency":2000,"glitchIrregularity":1,"glitchCoarseness":2,"glitchAnimSpeed":0.85,"dissolveFrequency":3,"dissolveAmplitude":0.15,"dissolveEdgeWidth":0.5,"dissolveAreaSize":1.8,"dissolveTransitionSpeed":2.1,"dissolveEdgeColor":"#00dcff","dissolveOuterGlow":0,"dissolveLineThickness":0.06,"insideColor":"#ff002e","insideShadowStrength":0.85,"insideShadowSoftness":0.55,"statsHudTitle":"Phantom","statGrip":10,"statAccuracy":5,"statControl":8,"statPower":7,"statWeight":5,"statResponsiveness":8,"bgColor":"#190076","bgPageColor":"#000000","bgAnimVisible":false,"gridRowCount":6,"laneCount":2,"staggerAmount":0.3,"laneSpeed":1,"lengthStaggerAmount":0.3}];
 let shoeMatPacked = null, shoeMatPlain = null;
 let ballVideoNames = ['Shoe_2.webm', 'Phantom_GX.webm', 'Phantom.webm']; // getoond in het Data Input-paneel
 let ballVideoIsPacked = [true, true, true]; // false = door gebruiker gekoppeld, geen alpha-splitsing
 let ballVideoAspectOverride = [null, null, null]; // eigen beeldverhouding bij een gekoppeld bestand
 let lastLinkedVideoFile = null; // laatst gekozen bestand, zodat de 'gepakt'-checkbox ook achteraf nog werkt
+
+// basisconfiguratie voor een NIEUW toegevoegde bal: bewust neutrale, simpele instellingen
+// (geen kopie van een bestaande bal), zodat je altijd van een voorspelbaar startpunt af
+// helemaal opnieuw kunt opbouwen.
+const BASIC_BALL_PROFILE = {
+  ballScale: 0.8, subdivN: 4, viewMode: 'images', gapValue: 0.02, tubeRadiusVal: 0.003,
+  rotationSpeed: 0.0065, rotationDirection: 1, ballRotX: 0, ballRotY: 0, ballRotZ: 0,
+  ballEdgeBlur: 0, ballVisible: true, sphereVisible: true,
+  gradType: 'linear', gradSpeed: 1, gradColors: ['#ffffff', '#888888', '#333333', '#111111', '#000000'],
+  gradAngleDeg: 0, gradStagger: 0, gradDirection: 1, gradBlur: 10, gradNoise: 0,
+  auraSphereRadius: 2.6, auraRotX: 0, auraRotY: 0, auraRotZ: 0, auraSpinSpeed: 0,
+  auraCircleCount: 20, auraTubeRadius: 0.003, auraGradColors: ['#00ff7b', '#7800ff', '#e5acff', '#80fcc1'],
+  auraGradStagger: 1, auraVisibleCount: 5, auraThicknessStagger: 1, auraSequenceSpeed: 20, auraSequenceDirection: 1,
+  iconColor: '#ffffff', iconGridCols: 15, iconGridRows: 15, iconVisibleCount: 20, iconSequenceSpeed: 60,
+  iconGridVisible: true, iconRandomness: 0.25,
+  glitchWidth: 0.05, glitchHeight: 0.02, glitchFrequency: 3000, glitchIrregularity: 1, glitchCoarseness: 2, glitchAnimSpeed: 0.85,
+  dissolveFrequency: 2, dissolveAmplitude: 0.15, dissolveEdgeWidth: 0.4, dissolveAreaSize: 1.2,
+  dissolveTransitionSpeed: 4, dissolveEdgeColor: '#ffffff', dissolveOuterGlow: 0, dissolveLineThickness: 0,
+  insideColor: '#111111', insideShadowStrength: 0.5, insideShadowSoftness: 1,
+  statsHudTitle: 'New Shoe', statGrip: 5, statAccuracy: 5, statControl: 5, statPower: 5, statWeight: 5, statResponsiveness: 5,
+  bgColor: '#190076', bgPageColor: '#000000', bgAnimVisible: false,
+  gridRowCount: 6, laneCount: 2, staggerAmount: 0.3, laneSpeed: 1, lengthStaggerAmount: 0.3
+};
+
+// voegt een nieuwe bal toe aan het totaal: basisconfiguratie, geen video (het schoen-vlak
+// wordt voor deze bal verborgen tot je er zelf een koppelt via Data Input), en vliegt er
+// meteen naartoe zoals bij het wisselen met de pijlen.
+function addNewBall(){
+  const newIndex = ballProfiles.length;
+  ballProfiles.push(JSON.parse(JSON.stringify(BASIC_BALL_PROFILE)));
+  shoeVideoTextures.push(null);
+  ballVideoNames.push('Geen video');
+  ballVideoIsPacked.push(false);
+  ballVideoAspectOverride.push(null);
+  BALL_VIDEO_CONFIG.push({ elId: null, aspect: 1 });
+
+  flyBallTransition(1, ()=> switchBall(newIndex));
+}
 
 // ------ hexagon dissolve-hover ------
 let hoverRaycastProxy = null;
@@ -1172,14 +1200,26 @@ function init(){
   // Bij een GELADEN opgeslagen bestand staan ballProfiles al gevuld (zie handleSaveSettings) -
   // die mogen we dan niet overschrijven, anders gaan de opgeslagen instellingen van de
   // andere ballen alsnog verloren.
-  if (!ballProfiles[0]) ballProfiles[0] = captureProfile();
-  if (!ballProfiles[1]) ballProfiles[1] = captureProfile();
-  if (!ballProfiles[2]) ballProfiles[2] = captureProfile();
+  for(let i=0; i<ballProfiles.length; i++){
+    if (!ballProfiles[i]) ballProfiles[i] = captureProfile();
+  }
+
+  // als een geladen bestand MEER ballen bevat dan de meegeleverde video-config (bv. via
+  // eerder toegevoegde ballen), vullen we de bijbehorende video-tracking-arrays aan zodat
+  // alles even lang blijft - anders zou bal-index buiten bereik raken.
+  while (shoeVideoTextures.length < ballProfiles.length){
+    shoeVideoTextures.push(null);
+    ballVideoNames.push('Geen video');
+    ballVideoIsPacked.push(false);
+    ballVideoAspectOverride.push(null);
+    BALL_VIDEO_CONFIG.push({ elId: null, aspect: 1 });
+  }
 
   // als een geladen bestand een andere bal dan de eerste actief had staan, moet de
   // getoonde schoen-video daar meteen mee overeenkomen.
   applyShoeMaterialForBall(currentBallIndex);
   updateVideoLinkPanel();
+  updateBallIndicator();
 
   window.addEventListener('resize', onResize);
 }
@@ -2355,7 +2395,8 @@ function flyBallTransition(direction, swapFn){
 // en zet de bijpassende schoen-video op het schoen-vlak (met de juiste beeldverhouding)
 function switchBall(newIndex){
   ballProfiles[currentBallIndex] = captureProfile();
-  currentBallIndex = ((newIndex % 3) + 3) % 3;
+  const n = ballProfiles.length;
+  currentBallIndex = ((newIndex % n) + n) % n;
 
   if (ballProfiles[currentBallIndex]){
     applyProfile(ballProfiles[currentBallIndex]);
@@ -2365,6 +2406,12 @@ function switchBall(newIndex){
 
   applyShoeMaterialForBall(currentBallIndex);
   updateVideoLinkPanel();
+  updateBallIndicator();
+}
+
+function updateBallIndicator(){
+  const el = document.getElementById('ballIndicator');
+  if (el) el.textContent = (currentBallIndex + 1) + ' of ' + ballProfiles.length;
 }
 
 // zet het schoen-vlak op de video (en het bijbehorende materiaal/beeldverhouding) van
@@ -2416,7 +2463,14 @@ function linkCustomVideoFile(file, isPacked){
 }
 
 function applyShoeMaterialForBall(index){
-  if (!shoeMesh || !shoeVideoTextures[index]) return;
+  if (!shoeMesh) return;
+  if (!shoeVideoTextures[index]){
+    // deze bal heeft (nog) geen video gekoppeld - laat het schoen-vlak gewoon leeg/verborgen
+    // in plaats van de video van de vorige bal te blijven tonen.
+    shoeMesh.visible = false;
+    return;
+  }
+  shoeMesh.visible = true;
   const isPacked = ballVideoIsPacked[index];
   // ballVideoAspectOverride staat alleen op een waarde als de gebruiker zelf een bestand
   // heeft gekoppeld (gepakt of niet) - anders vallen we terug op de vaste beeldverhouding
@@ -2530,7 +2584,7 @@ function handleSaveSettings(){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'voetbal_3d_lijntekening_opgeslagen.html';
+    a.download = 'Gradient_football.html';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -2621,37 +2675,8 @@ function syncControlsFromState(){
   setSliderVal('insideShadowStrengthSlider','insideShadowStrengthVal', insideShadowStrength, v=>v.toFixed(2));
   setSliderVal('insideShadowSoftnessSlider','insideShadowSoftnessVal', insideShadowSoftness, v=>v.toFixed(2));
 
-  setToggleState('ballVisToggle', !ballVisible);
-  setToggleState('sphereVisToggle', !sphereVisible);
-  setToggleState('iconGridVisToggle', !iconGridVisible);
   group.visible = ballVisible;
   if (auraGroup) auraGroup.visible = sphereVisible;
-
-  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-  if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', handleSaveSettings);
-
-  const toggleUiBtn = document.getElementById('toggleUiBtn');
-  const toggleUiSlash = document.getElementById('toggleUiSlash');
-  const toggleDataBtn = document.getElementById('toggleDataBtn');
-  const toggleDataSlash = document.getElementById('toggleDataSlash');
-
-  // Design & Animatie en Data Input kunnen nooit samen actief zijn (activeren van de
-  // ene zet de andere uit), maar wel samen inactief - klik op een actieve knop om 'm
-  // uit te zetten, klik op een inactieve knop om 'm (en alleen die) aan te zetten.
-  if (toggleUiBtn){
-    toggleUiBtn.addEventListener('click', ()=>{
-      uiPanelsVisible = !uiPanelsVisible;
-      if (uiPanelsVisible) dataInputVisible = false;
-      applyPanelVisibility();
-    });
-  }
-  if (toggleDataBtn){
-    toggleDataBtn.addEventListener('click', ()=>{
-      dataInputVisible = !dataInputVisible;
-      if (dataInputVisible) uiPanelsVisible = false;
-      applyPanelVisibility();
-    });
-  }
 }
 
 function syncAuraVisibleBounds(){
@@ -3027,33 +3052,6 @@ function setupPanel(){
     iconSpeedVal.textContent = iconSequenceSpeed.toFixed(2);
   });
 
-  // individuele zichtbaarheid: bal, sphere en icon-grid elk apart aan/uit
-  const ballVisToggle = document.getElementById('ballVisToggle');
-  ballVisToggle.addEventListener('click', ()=>{
-    const goingRight = !ballVisToggle.classList.contains('right');
-    ballVisToggle.classList.toggle('right', goingRight);
-    ballVisToggle.classList.toggle('left', !goingRight);
-    ballVisible = !goingRight;
-    group.visible = ballVisible;
-  });
-
-  const sphereVisToggle = document.getElementById('sphereVisToggle');
-  sphereVisToggle.addEventListener('click', ()=>{
-    const goingRight = !sphereVisToggle.classList.contains('right');
-    sphereVisToggle.classList.toggle('right', goingRight);
-    sphereVisToggle.classList.toggle('left', !goingRight);
-    sphereVisible = !goingRight;
-    if (auraGroup) auraGroup.visible = sphereVisible;
-  });
-
-  const iconGridVisToggle = document.getElementById('iconGridVisToggle');
-  iconGridVisToggle.addEventListener('click', ()=>{
-    const goingRight = !iconGridVisToggle.classList.contains('right');
-    iconGridVisToggle.classList.toggle('right', goingRight);
-    iconGridVisToggle.classList.toggle('left', !goingRight);
-    iconGridVisible = !goingRight;
-  });
-
   const glitchWidthSlider = document.getElementById('glitchWidthSlider');
   const glitchWidthVal = document.getElementById('glitchWidthVal');
   glitchWidthSlider.addEventListener('input', (e)=>{
@@ -3206,6 +3204,36 @@ function setupPanel(){
   const navArrowRight = document.getElementById('navArrowRight');
   if (navArrowLeft) navArrowLeft.addEventListener('click', ()=> flyBallTransition(-1, ()=> switchBall(currentBallIndex - 1)));
   if (navArrowRight) navArrowRight.addEventListener('click', ()=> flyBallTransition(1, ()=> switchBall(currentBallIndex + 1)));
+
+  const addBallBtn = document.getElementById('addBallBtn');
+  if (addBallBtn) addBallBtn.addEventListener('click', addNewBall);
+
+  // deze listeners horen hier in setupPanel() (draait maar één keer), NIET in
+  // syncControlsFromState() (draait bij elke bal-wissel) - anders stapelen ze zich op en
+  // lijkt een klik na een paar keer wisselen willekeurig wel/niet te werken.
+  const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+  if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', handleSaveSettings);
+
+  const toggleUiBtn = document.getElementById('toggleUiBtn');
+  const toggleDataBtn = document.getElementById('toggleDataBtn');
+
+  // Design & Animatie en Data Input kunnen nooit samen actief zijn (activeren van de
+  // ene zet de andere uit), maar wel samen inactief - klik op een actieve knop om 'm
+  // uit te zetten, klik op een inactieve knop om 'm (en alleen die) aan te zetten.
+  if (toggleUiBtn){
+    toggleUiBtn.addEventListener('click', ()=>{
+      uiPanelsVisible = !uiPanelsVisible;
+      if (uiPanelsVisible) dataInputVisible = false;
+      applyPanelVisibility();
+    });
+  }
+  if (toggleDataBtn){
+    toggleDataBtn.addEventListener('click', ()=>{
+      dataInputVisible = !dataInputVisible;
+      if (dataInputVisible) uiPanelsVisible = false;
+      applyPanelVisibility();
+    });
+  }
 
   // Lottie-pijl-animaties: standaard staat het eerste frame stil, bij hover speelt de
   // animatie eenmalig af vanaf het begin.
